@@ -7,9 +7,11 @@ interface HeroVideoProps {
   videoSrc: string;
   hasEnded: boolean;
   hasError: boolean;
+  needsInteraction: boolean;
   onEnded: () => void;
   onError: () => void;
   onLoadedMetadata: () => void;
+  onUserPlay: () => void;
 }
 
 export function HeroVideo({
@@ -17,9 +19,11 @@ export function HeroVideo({
   videoSrc,
   hasEnded,
   hasError,
+  needsInteraction,
   onEnded,
   onError,
   onLoadedMetadata,
+  onUserPlay,
 }: HeroVideoProps) {
   if (hasError) {
     return (
@@ -36,23 +40,39 @@ export function HeroVideo({
   }
 
   return (
-    <video
-      ref={videoRef}
-      src={videoSrc}
-      className={`h-full w-full origin-center object-cover transition-[filter] duration-1000 ${
-        hasEnded
-          ? "brightness-[1.12] contrast-[1.15] saturate-[1.35]"
-          : "brightness-100 contrast-100 saturate-100"
-      }`}
-      autoPlay
-      muted
-      playsInline
-      preload="auto"
-      poster={HERO_POSTER.jpg}
-      aria-hidden="true"
-      onLoadedMetadata={onLoadedMetadata}
-      onEnded={onEnded}
-      onError={onError}
-    />
+    <>
+      <video
+        key={videoSrc}
+        ref={videoRef}
+        src={videoSrc}
+        className={`h-full w-full origin-center object-cover transition-[filter] duration-1000 ${
+          hasEnded
+            ? "brightness-[1.12] contrast-[1.15] saturate-[1.35]"
+            : "brightness-100 contrast-100 saturate-100"
+        }`}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        poster={HERO_POSTER.jpg}
+        aria-hidden="true"
+        onLoadedMetadata={onLoadedMetadata}
+        onEnded={onEnded}
+        onError={onError}
+      />
+
+      {needsInteraction && !hasEnded && (
+        <button
+          type="button"
+          onClick={onUserPlay}
+          className="absolute inset-0 z-[5] flex items-end justify-center bg-black/25 pb-24 md:pb-32"
+          aria-label="Reproducir vídeo de introducción"
+        >
+          <span className="font-condensed text-xs font-bold uppercase tracking-wide text-ice-white/90">
+            Toca para reproducir
+          </span>
+        </button>
+      )}
+    </>
   );
 }

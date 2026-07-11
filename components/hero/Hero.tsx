@@ -20,11 +20,13 @@ export function Hero() {
   const {
     hasEnded,
     hasError,
+    needsInteraction,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
     handleLoadedMetadata,
+    handleUserPlay,
   } = useVideoEndFreeze();
 
   const { scrollYProgress } = useScroll({
@@ -74,9 +76,11 @@ export function Hero() {
             videoSrc={videoSrc}
             hasEnded={hasEnded}
             hasError={hasError}
+            needsInteraction={needsInteraction}
             onEnded={handleEnded}
             onError={handleError}
             onLoadedMetadata={handleLoadedMetadata}
+            onUserPlay={handleUserPlay}
           />
         </div>
 
