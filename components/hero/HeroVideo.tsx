@@ -1,0 +1,58 @@
+"use client";
+
+import { HERO_POSTER } from "@/lib/constants/hero";
+
+interface HeroVideoProps {
+  videoRef: React.RefObject<HTMLVideoElement | null>;
+  videoSrc: string;
+  hasEnded: boolean;
+  hasError: boolean;
+  onEnded: () => void;
+  onError: () => void;
+  onLoadedMetadata: () => void;
+}
+
+export function HeroVideo({
+  videoRef,
+  videoSrc,
+  hasEnded,
+  hasError,
+  onEnded,
+  onError,
+  onLoadedMetadata,
+}: HeroVideoProps) {
+  if (hasError) {
+    return (
+      <picture className="absolute inset-0 z-0 h-full w-full">
+        <source srcSet={HERO_POSTER.webp} type="image/webp" />
+        <img
+          src={HERO_POSTER.jpg}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover"
+        />
+      </picture>
+    );
+  }
+
+  return (
+    <video
+      ref={videoRef}
+      src={videoSrc}
+      className={`h-full w-full origin-center object-cover transition-[filter] duration-1000 ${
+        hasEnded
+          ? "brightness-[1.12] contrast-[1.15] saturate-[1.35]"
+          : "brightness-100 contrast-100 saturate-100"
+      }`}
+      autoPlay
+      muted
+      playsInline
+      preload="auto"
+      poster={HERO_POSTER.jpg}
+      aria-hidden="true"
+      onLoadedMetadata={onLoadedMetadata}
+      onEnded={onEnded}
+      onError={onError}
+    />
+  );
+}

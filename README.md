@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ICE UP! — Web completa
 
-## Getting Started
+Marca de ropa de lujo artesanal · **El Chico de Hielo**
 
-First, run the development server:
+Stack: Next.js 16 · TypeScript · Tailwind CSS 4 · Framer Motion · Medusa.js · Zustand
+
+## Arrancar en local
 
 ```bash
+cd iceup2
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Dependencias principales
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Paquete | Versión |
+|---------|---------|
+| next | 16.2.10 |
+| react | 19.2.4 |
+| framer-motion | ^12.42 |
+| @medusajs/js-sdk | ^2.17 |
+| zustand | ^5.0 |
+| tailwindcss | ^4 |
 
-## Learn More
+## Variables de entorno
 
-To learn more about Next.js, take a look at the following resources:
+Copia `.env.local.example` → `.env.local`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Sin Medusa, la tienda funciona en **modo demo** con 4 productos locales.
 
-## Deploy on Vercel
+## Medusa (backend e-commerce)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. PostgreSQL
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Opción Docker:
+
+```bash
+docker run -d --name iceup-postgres \
+  -e POSTGRES_USER=medusa \
+  -e POSTGRES_PASSWORD=medusa \
+  -e POSTGRES_DB=medusa \
+  -p 5432:5432 postgres:16
+```
+
+### 2. Crear backend
+
+```bash
+cd ..
+npx create-medusa-app@latest iceup-medusa
+# DATABASE_URL=postgres://medusa:medusa@localhost:5432/medusa
+```
+
+### 3. Stripe
+
+```bash
+cd iceup-medusa
+npm install @medusajs/payment-stripe
+```
+
+Configura el provider en `medusa-config.ts` y añade `STRIPE_API_KEY` al `.env` del backend.
+
+### 4. Publishable key
+
+Medusa Admin → Settings → Publishable API Keys → crea una key y ponla en el frontend.
+
+## Assets de vídeo (Hero)
+
+Ver `docs/hero-ffmpeg.md` para regenerar `intro-desktop.mp4`, `intro-mobile.mp4` y posters.
+
+## Despliegue
+
+| Servicio | Plataforma |
+|----------|------------|
+| Frontend | **Vercel** — conectar repo, `NEXT_PUBLIC_*` en env |
+| Medusa | **Railway** o **Render** |
+| PostgreSQL | Railway / Render / Supabase |
+
+Build: `npm run build` · Start: `npm run start`
+
+## Estructura
+
+```
+app/           → páginas (/, /coleccion, /producto/[handle], /checkout)
+components/    → hero, archive, atelier, shop, layout
+lib/medusa/    → SDK, productos, carrito
+stores/        → cart-store (Zustand)
+public/        → vídeos, imágenes, archive, atelier
+```
+
+## Checklist QA
+
+- [ ] Hero: vídeo ~7s, congela en último frame, CTA tras `ended`
+- [ ] Hero: scroll parallax tras finalizar vídeo
+- [ ] Archivo: filtros, modal teclado (←/→/Esc), grayscale→color
+- [ ] Atelier: scrollytelling 4 fases en desktop
+- [ ] Tienda: grid, variantes, carrito drawer
+- [ ] Checkout: formulario demo o Medusa+Stripe
+- [ ] Chrome / Safari / mobile
+- [ ] `prefers-reduced-motion`: salta al frame final
+- [ ] Lighthouse: imágenes lazy, vídeo optimizado mobile/desktop
+
+## Licencia
+
+Proyecto privado — ICE UP!

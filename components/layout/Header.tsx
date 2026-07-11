@@ -1,0 +1,107 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { BrandMark } from "@/components/brand/BrandMark";
+import { useCartStore } from "@/stores/cart-store";
+import { useHeroStore } from "@/stores/hero-store";
+import { HERO_Z_INDEX } from "@/lib/constants/hero";
+import { SITE } from "@/lib/constants/site";
+import { SiteTicker } from "./SiteTicker";
+import { MobileNav } from "./MobileNav";
+
+const NAV_LINKS = [
+  { href: "/#archivo", label: "Archivo" },
+  { href: "/#atelier", label: "Atelier" },
+  { href: "/coleccion", label: "Colección" },
+];
+
+export function Header() {
+  const pathname = usePathname();
+  const itemCount = useCartStore((state) => state.itemCount);
+  const openCart = useCartStore((state) => state.openCart);
+  const introFinished = useHeroStore((state) => state.introFinished);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const isHome = pathname === "/";
+  const isVisible = !isHome || introFinished;
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 48);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  return (
+    <>
+      <AnimatePresence>
+        {isVisible && (
+          <motion.header
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className={`fixed inset-x-0 top-0 border-b border-ice-gray-800 bg-ice-black ${
+              isHome && !scrolled && !menuOpen ? "" : ""
+            }`}
+            style={{ zIndex: HERO_Z_INDEX.nav }}
+          >
+            <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 md:h-16 md:px-6">
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className="flex items-center gap-2.5 text-ice-white"
+              >
+                <BrandMark className="h-7 w-7 md:h-8 md:w-8" />
+                <span className="font-condensed text-base font-black uppercase tracking-wide md:text-lg">
+                  {SITE.name}
+                </span>
+              </Link>
+
+              <nav className="hidden items-center gap-6 md:flex" aria-label="Principal">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="font-condensed text-xs font-bold uppercase tracking-wide text-ice-gray-300 transition-colors hover:text-ice-white"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={openCart}
+                  className="font-condensed text-xs font-bold uppercase tracking-wide text-ice-gray-200 transition-colors hover:text-ice-white"
+                  aria-label={`Abrir carrito, ${itemCount} artículos`}
+                >
+                  Carrito ({itemCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((value) => !value)}
+                  className="font-condensed text-xs font-bold uppercase tracking-wide text-ice-gray-200 md:hidden"
+                  aria-expanded={menuOpen}
+                  aria-label="Abrir menú"
+                >
+                  Menú
+                </button>
+              </div>
+            </div>
+            <SiteTicker />
+          </motion.header>
+        )}
+      </AnimatePresence>
+
+      <MobileNav open={menuOpen && isVisible} onClose={closeMenu} links={NAV_LINKS} />
+    </>
+  );
+}
