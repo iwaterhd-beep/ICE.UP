@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Inter, Space_Grotesk } from "next/font/google";
-import { Header, Footer } from "@/components/layout";
+import { Header, FooterShell } from "@/components/layout";
 import { CartDrawer } from "@/components/shop";
 import { defaultMetadata } from "@/lib/constants/metadata";
 import "./globals.css";
@@ -39,7 +39,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-ice-black text-ice-white font-body">
         <Header />
         <div className="flex-1">{children}</div>
-        <Footer />
+        <FooterShell />
         <CartDrawer />
       </body>
     </html>

@@ -21,12 +21,12 @@ export function Header() {
   const pathname = usePathname();
   const itemCount = useCartStore((state) => state.itemCount);
   const openCart = useCartStore((state) => state.openCart);
-  const introFinished = useHeroStore((state) => state.introFinished);
+  const hasEntered = useHeroStore((state) => state.hasEntered);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isHome = pathname === "/";
-  const isVisible = !isHome || introFinished;
+  const isVisible = !isHome || hasEntered;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);

@@ -14,7 +14,8 @@ import { HeroVideo } from "./HeroVideo";
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const setIntroFinished = useHeroStore((state) => state.setIntroFinished);
+  const setVideoEnded = useHeroStore((state) => state.setVideoEnded);
+  const hasEntered = useHeroStore((state) => state.hasEntered);
   const resetIntro = useHeroStore((state) => state.resetIntro);
 
   const {
@@ -45,18 +46,29 @@ export function Hero() {
   }, [resetIntro]);
 
   useEffect(() => {
-    setIntroFinished(hasEnded);
-  }, [hasEnded, setIntroFinished]);
+    setVideoEnded(hasEnded);
+  }, [hasEnded, setVideoEnded]);
+
+  useEffect(() => {
+    if (hasEntered) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [hasEntered]);
 
   useMotionValueEvent(videoScale, "change", (scale) => {
     const video = videoRef.current;
-    if (!video || !hasEnded) return;
+    if (!video || !hasEntered) return;
     video.style.transform = `scale(${scale})`;
   });
 
   useMotionValueEvent(videoOpacity, "change", (opacity) => {
     const video = videoRef.current;
-    if (!video || !hasEnded) return;
+    if (!video || !hasEntered) return;
     video.style.opacity = String(opacity);
   });
 
@@ -64,7 +76,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="inicio"
-      className="relative h-[200vh] w-full"
+      className={`relative w-full ${hasEntered ? "h-[200vh]" : "h-screen"}`}
       aria-label="Introducción ICE UP"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
@@ -88,15 +100,17 @@ export function Hero() {
 
         <div
           className={`pointer-events-none absolute inset-0 transition-opacity duration-1000 ${
-            hasEnded
-              ? "bg-gradient-to-t from-black/35 via-transparent to-transparent"
-              : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
+            hasEnded && !hasEntered
+              ? "bg-black/20"
+              : hasEnded
+                ? "bg-gradient-to-t from-black/35 via-transparent to-transparent"
+                : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
           }`}
           style={{ zIndex: HERO_Z_INDEX.overlay }}
           aria-hidden="true"
         />
 
-        <HeroContent hasEnded={hasEnded} contentOpacity={contentOpacity} isPlaying={isPlaying} />
+        <HeroContent hasEnded={hasEnded} contentOpacity={contentOpacity} />
       </div>
     </section>
   );
