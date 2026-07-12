@@ -9,6 +9,7 @@ interface HeroVideoProps {
   hasError: boolean;
   isPlaying: boolean;
   needsInteraction: boolean;
+  showEnterGate: boolean;
   onEnded: () => void;
   onError: () => void;
   onPlaying: () => void;
@@ -22,6 +23,7 @@ export function HeroVideo({
   hasError,
   isPlaying,
   needsInteraction,
+  showEnterGate,
   onEnded,
   onError,
   onPlaying,
@@ -66,12 +68,14 @@ export function HeroVideo({
         key={videoSrc}
         ref={videoRef}
         src={videoSrc}
-        className={`absolute inset-0 h-full w-full object-cover transition-[filter] duration-1000 ${
-          hasEnded
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+          showEnterGate ? "pointer-events-none opacity-0" : ""
+        } ${
+          hasEnded && !showEnterGate
             ? "brightness-[1.08] contrast-[1.1] saturate-[1.2]"
             : "brightness-100 contrast-100 saturate-100"
         }`}
-        autoPlay
+        autoPlay={!hasEnded}
         muted
         playsInline
         preload="auto"

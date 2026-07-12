@@ -19,11 +19,6 @@ export function HeroEnterGate() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: LUXURY_EASE }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-black/25 backdrop-blur-[1px]"
-        aria-hidden="true"
-      />
-
       <motion.button
         type="button"
         onClick={enterSite}

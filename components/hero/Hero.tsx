@@ -31,6 +31,8 @@ export function Hero() {
     handleUserPlay,
   } = useVideoEndFreeze();
 
+  const showEnterGate = hasEnded && !hasEntered;
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
@@ -91,6 +93,7 @@ export function Hero() {
             hasError={hasError}
             isPlaying={isPlaying}
             needsInteraction={needsInteraction}
+            showEnterGate={showEnterGate}
             onEnded={handleEnded}
             onError={handleError}
             onPlaying={handlePlaying}
@@ -98,10 +101,18 @@ export function Hero() {
           />
         </div>
 
+        {showEnterGate && (
+          <div
+            className="absolute inset-0 bg-white/25 transition-opacity duration-700"
+            style={{ zIndex: HERO_Z_INDEX.overlay }}
+            aria-hidden="true"
+          />
+        )}
+
         <div
           className={`pointer-events-none absolute inset-0 transition-opacity duration-1000 ${
-            hasEnded && !hasEntered
-              ? "bg-black/20"
+            showEnterGate
+              ? "opacity-0"
               : hasEnded
                 ? "bg-gradient-to-t from-black/35 via-transparent to-transparent"
                 : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"

@@ -27,7 +27,6 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const triedSourcesRef = useRef<Set<string>>(new Set());
   const playStartedRef = useRef(false);
-  const maxTimeRef = useRef(0);
 
   const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEOS.mobile);
   const [hasEnded, setHasEnded] = useState(false);
@@ -41,6 +40,7 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
 
     video.muted = true;
     video.playsInline = true;
+    video.loop = false;
 
     if (video.currentTime < 0.1) {
       video.currentTime = 0;
@@ -59,7 +59,6 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
     const initial = pickInitialSrc();
     triedSourcesRef.current = new Set([initial]);
     playStartedRef.current = false;
-    maxTimeRef.current = 0;
     setVideoSrc(initial);
     setHasEnded(false);
     setHasError(false);
@@ -69,10 +68,9 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || hasEnded) return;
 
     playStartedRef.current = false;
-    maxTimeRef.current = 0;
     video.load();
 
     const requestPlay = () => {
@@ -88,49 +86,43 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
       video.removeEventListener("canplaythrough", requestPlay);
       video.removeEventListener("loadeddata", requestPlay);
     };
-  }, [videoSrc, tryPlay]);
+  }, [videoSrc, tryPlay, hasEnded]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !hasEnded) return;
 
-    const onTimeUpdate = () => {
-      maxTimeRef.current = Math.max(maxTimeRef.current, video.currentTime);
+    video.pause();
+    video.loop = false;
+
+    const blockReplay = () => {
+      video.pause();
     };
 
-    video.addEventListener("timeupdate", onTimeUpdate);
-    return () => video.removeEventListener("timeupdate", onTimeUpdate);
-  }, [videoSrc]);
+    video.addEventListener("play", blockReplay);
+    return () => video.removeEventListener("play", blockReplay);
+  }, [hasEnded]);
 
   const handleEnded = useCallback(() => {
     const video = videoRef.current;
-    const duration = video?.duration ?? 0;
-    const watched = maxTimeRef.current;
-
-    // Ignora "ended" espurio si casi no se reprodujo
-    if (duration > 0 && watched < Math.min(3, duration * 0.75)) {
-      if (video) {
-        video.currentTime = 0;
-        maxTimeRef.current = 0;
-        playStartedRef.current = false;
-        void video.play().catch(() => setNeedsInteraction(true));
-      }
-      return;
-    }
-
     if (video) {
       video.pause();
+      video.loop = false;
     }
+    playStartedRef.current = true;
     setHasEnded(true);
     setNeedsInteraction(false);
   }, []);
 
   const handlePlaying = useCallback(() => {
+    if (hasEnded) return;
     setIsPlaying(true);
     setNeedsInteraction(false);
-  }, []);
+  }, [hasEnded]);
 
   const handleError = useCallback(() => {
+    if (hasEnded) return;
+
     const next = FALLBACK_SOURCES.find((src) => !triedSourcesRef.current.has(src));
 
     if (!next) {
@@ -141,20 +133,20 @@ export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
 
     triedSourcesRef.current.add(next);
     playStartedRef.current = false;
-    maxTimeRef.current = 0;
     setIsPlaying(false);
     setVideoSrc(next);
-  }, []);
+  }, [hasEnded]);
 
   const handleUserPlay = useCallback(() => {
+    if (hasEnded) return;
+
     playStartedRef.current = false;
     const video = videoRef.current;
     if (video) {
       video.currentTime = 0;
-      maxTimeRef.current = 0;
     }
     void tryPlay();
-  }, [tryPlay]);
+  }, [hasEnded, tryPlay]);
 
   return {
     hasEnded,
