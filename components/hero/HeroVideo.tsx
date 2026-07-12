@@ -7,10 +7,11 @@ interface HeroVideoProps {
   videoSrc: string;
   hasEnded: boolean;
   hasError: boolean;
+  isPlaying: boolean;
   needsInteraction: boolean;
   onEnded: () => void;
   onError: () => void;
-  onCanPlay: () => void;
+  onPlaying: () => void;
   onUserPlay: () => void;
 }
 
@@ -19,23 +20,43 @@ export function HeroVideo({
   videoSrc,
   hasEnded,
   hasError,
+  isPlaying,
   needsInteraction,
   onEnded,
   onError,
-  onCanPlay,
+  onPlaying,
   onUserPlay,
 }: HeroVideoProps) {
-  if (hasError) {
+  const showPlayButton = (needsInteraction || hasError) && !hasEnded && !isPlaying;
+
+  if (hasError && !isPlaying) {
     return (
-      <picture className="absolute inset-0 z-0 h-full w-full">
-        <source srcSet={HERO_POSTER.webp} type="image/webp" />
-        <img
-          src={HERO_POSTER.jpg}
-          alt=""
-          aria-hidden="true"
-          className="h-full w-full object-cover"
-        />
-      </picture>
+      <div className="absolute inset-0 bg-ice-black">
+        <picture className="absolute inset-0 h-full w-full opacity-40">
+          <source srcSet={HERO_POSTER.webp} type="image/webp" />
+          <img
+            src={HERO_POSTER.jpg}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover"
+          />
+        </picture>
+        {showPlayButton && (
+          <button
+            type="button"
+            onClick={onUserPlay}
+            className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-4 bg-black/50"
+            aria-label="Reproducir vídeo de introducción"
+          >
+            <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ice-white bg-ice-white/10">
+              <span className="ml-1 text-2xl text-ice-white">▶</span>
+            </span>
+            <span className="font-condensed text-sm font-bold uppercase tracking-wide text-ice-white">
+              Reproducir intro
+            </span>
+          </button>
+        )}
+      </div>
     );
   }
 
@@ -54,23 +75,25 @@ export function HeroVideo({
         muted
         playsInline
         preload="auto"
-        poster={HERO_POSTER.jpg}
+        poster={isPlaying || hasEnded ? undefined : HERO_POSTER.jpg}
         aria-hidden="true"
-        onCanPlay={onCanPlay}
-        onLoadedData={onCanPlay}
+        onPlaying={onPlaying}
         onEnded={onEnded}
         onError={onError}
       />
 
-      {needsInteraction && !hasEnded && (
+      {showPlayButton && (
         <button
           type="button"
           onClick={onUserPlay}
-          className="absolute inset-0 z-[5] flex items-end justify-center bg-black/20 pb-24 md:pb-32"
+          className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-4 bg-black/40"
           aria-label="Reproducir vídeo de introducción"
         >
-          <span className="font-condensed text-xs font-bold uppercase tracking-wide text-ice-white/90">
-            Toca para reproducir
+          <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ice-white bg-ice-white/10 backdrop-blur-sm">
+            <span className="ml-1 text-2xl text-ice-white">▶</span>
+          </span>
+          <span className="font-condensed text-sm font-bold uppercase tracking-wide text-ice-white">
+            Reproducir intro
           </span>
         </button>
       )}

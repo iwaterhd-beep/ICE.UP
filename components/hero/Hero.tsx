@@ -20,12 +20,13 @@ export function Hero() {
   const {
     hasEnded,
     hasError,
+    isPlaying,
     needsInteraction,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
-    handleCanPlay,
+    handlePlaying,
     handleUserPlay,
   } = useVideoEndFreeze();
 
@@ -76,10 +77,11 @@ export function Hero() {
             videoSrc={videoSrc}
             hasEnded={hasEnded}
             hasError={hasError}
+            isPlaying={isPlaying}
             needsInteraction={needsInteraction}
             onEnded={handleEnded}
             onError={handleError}
-            onCanPlay={handleCanPlay}
+            onPlaying={handlePlaying}
             onUserPlay={handleUserPlay}
           />
         </div>
@@ -94,7 +96,7 @@ export function Hero() {
           aria-hidden="true"
         />
 
-        <HeroContent hasEnded={hasEnded} contentOpacity={contentOpacity} />
+        <HeroContent hasEnded={hasEnded} contentOpacity={contentOpacity} isPlaying={isPlaying} />
       </div>
     </section>
   );

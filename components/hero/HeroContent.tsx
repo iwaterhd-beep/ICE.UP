@@ -7,6 +7,7 @@ import { SITE } from "@/lib/constants/site";
 
 interface HeroContentProps {
   hasEnded: boolean;
+  isPlaying: boolean;
   contentOpacity: MotionValue<number>;
 }
 
@@ -33,7 +34,7 @@ const itemVariants = {
   },
 };
 
-export function HeroContent({ hasEnded, contentOpacity }: HeroContentProps) {
+export function HeroContent({ hasEnded, isPlaying, contentOpacity }: HeroContentProps) {
   return (
     <motion.div
       className="relative z-20 flex h-full flex-col items-center justify-end px-6 pb-16 md:pb-24"

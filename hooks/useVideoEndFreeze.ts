@@ -3,162 +3,169 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HERO_VIDEOS } from "@/lib/constants/hero";
 
-interface UseVideoEndFreezeOptions {
-  onError?: () => void;
-}
-
 interface UseVideoEndFreezeReturn {
   hasEnded: boolean;
   hasError: boolean;
+  isPlaying: boolean;
   needsInteraction: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   videoSrc: string;
   handleEnded: () => void;
   handleError: () => void;
-  handleCanPlay: () => void;
+  handlePlaying: () => void;
   handleUserPlay: () => void;
 }
 
-const VIDEO_SOURCES = [
-  HERO_VIDEOS.mobile,
-  HERO_VIDEOS.desktop,
-  HERO_VIDEOS.fallback,
-] as const;
-
+/** Mobile first — carga ~2.7 MB vs ~8 MB desktop en Vercel */
 function pickInitialSrc(): string {
-  if (typeof window === "undefined") return HERO_VIDEOS.mobile;
-  return window.matchMedia("(max-width: 768px)").matches
-    ? HERO_VIDEOS.mobile
-    : HERO_VIDEOS.desktop;
+  return HERO_VIDEOS.mobile;
 }
 
-export function useVideoEndFreeze(
-  options: UseVideoEndFreezeOptions = {},
-): UseVideoEndFreezeReturn {
-  const { onError } = options;
+const FALLBACK_SOURCES = [HERO_VIDEOS.mobile, HERO_VIDEOS.desktop] as const;
+
+export function useVideoEndFreeze(): UseVideoEndFreezeReturn {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const sourceIndexRef = useRef(0);
-  const playAttemptedRef = useRef(false);
+  const triedSourcesRef = useRef<Set<string>>(new Set());
+  const playStartedRef = useRef(false);
+  const maxTimeRef = useRef(0);
 
   const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEOS.mobile);
   const [hasEnded, setHasEnded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(false);
-
-  const finishIntro = useCallback(() => {
-    setHasEnded(true);
-    setNeedsInteraction(false);
-  }, []);
 
   const tryPlay = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || hasEnded || hasError) return;
+    if (!video || hasEnded || playStartedRef.current) return;
 
     video.muted = true;
     video.playsInline = true;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reducedMotion) {
-      video.pause();
-      if (Number.isFinite(video.duration) && video.duration > 0) {
-        video.currentTime = Math.max(video.duration - 0.05, 0);
-      }
-      finishIntro();
-      return;
+    if (video.currentTime < 0.1) {
+      video.currentTime = 0;
     }
 
     try {
       await video.play();
-      playAttemptedRef.current = true;
+      playStartedRef.current = true;
       setNeedsInteraction(false);
     } catch {
-      playAttemptedRef.current = false;
       setNeedsInteraction(true);
     }
-  }, [finishIntro, hasEnded, hasError]);
+  }, [hasEnded]);
 
   useEffect(() => {
-    sourceIndexRef.current = 0;
-    playAttemptedRef.current = false;
-    setVideoSrc(pickInitialSrc());
+    const initial = pickInitialSrc();
+    triedSourcesRef.current = new Set([initial]);
+    playStartedRef.current = false;
+    maxTimeRef.current = 0;
+    setVideoSrc(initial);
     setHasEnded(false);
     setHasError(false);
+    setIsPlaying(false);
     setNeedsInteraction(false);
   }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    playStartedRef.current = false;
+    maxTimeRef.current = 0;
     video.load();
-  }, [videoSrc]);
 
-  useEffect(() => {
-    if (hasEnded || hasError) return;
-
-    const unlockTimer = window.setTimeout(() => {
-      if (!playAttemptedRef.current) {
-        finishIntro();
-        setNeedsInteraction(true);
-      }
-    }, 9000);
-
-    return () => window.clearTimeout(unlockTimer);
-  }, [videoSrc, hasEnded, hasError, finishIntro]);
-
-  const handleEnded = useCallback(() => {
-    finishIntro();
-  }, [finishIntro]);
-
-  const handleError = useCallback(() => {
-    const nextIndex = sourceIndexRef.current + 1;
-    if (nextIndex >= VIDEO_SOURCES.length) {
-      setHasError(true);
-      finishIntro();
-      onError?.();
-      return;
-    }
-
-    sourceIndexRef.current = nextIndex;
-    playAttemptedRef.current = false;
-    setVideoSrc(VIDEO_SOURCES[nextIndex]!);
-  }, [finishIntro, onError]);
-
-  const handleCanPlay = useCallback(() => {
-    void tryPlay();
-  }, [tryPlay]);
-
-  const handleUserPlay = useCallback(() => {
-    void tryPlay();
-  }, [tryPlay]);
-
-  useEffect(() => {
-    if (!needsInteraction) return;
-
-    const onInteract = () => {
+    const requestPlay = () => {
       void tryPlay();
     };
 
-    window.addEventListener("pointerdown", onInteract, { once: true });
-    window.addEventListener("keydown", onInteract, { once: true });
+    video.addEventListener("canplay", requestPlay);
+    video.addEventListener("canplaythrough", requestPlay);
+    video.addEventListener("loadeddata", requestPlay);
 
     return () => {
-      window.removeEventListener("pointerdown", onInteract);
-      window.removeEventListener("keydown", onInteract);
+      video.removeEventListener("canplay", requestPlay);
+      video.removeEventListener("canplaythrough", requestPlay);
+      video.removeEventListener("loadeddata", requestPlay);
     };
-  }, [needsInteraction, tryPlay]);
+  }, [videoSrc, tryPlay]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onTimeUpdate = () => {
+      maxTimeRef.current = Math.max(maxTimeRef.current, video.currentTime);
+    };
+
+    video.addEventListener("timeupdate", onTimeUpdate);
+    return () => video.removeEventListener("timeupdate", onTimeUpdate);
+  }, [videoSrc]);
+
+  const handleEnded = useCallback(() => {
+    const video = videoRef.current;
+    const duration = video?.duration ?? 0;
+    const watched = maxTimeRef.current;
+
+    // Ignora "ended" espurio si casi no se reprodujo
+    if (duration > 0 && watched < Math.min(3, duration * 0.75)) {
+      if (video) {
+        video.currentTime = 0;
+        maxTimeRef.current = 0;
+        playStartedRef.current = false;
+        void video.play().catch(() => setNeedsInteraction(true));
+      }
+      return;
+    }
+
+    if (video) {
+      video.pause();
+    }
+    setHasEnded(true);
+    setNeedsInteraction(false);
+  }, []);
+
+  const handlePlaying = useCallback(() => {
+    setIsPlaying(true);
+    setNeedsInteraction(false);
+  }, []);
+
+  const handleError = useCallback(() => {
+    const next = FALLBACK_SOURCES.find((src) => !triedSourcesRef.current.has(src));
+
+    if (!next) {
+      setHasError(true);
+      setNeedsInteraction(true);
+      return;
+    }
+
+    triedSourcesRef.current.add(next);
+    playStartedRef.current = false;
+    maxTimeRef.current = 0;
+    setIsPlaying(false);
+    setVideoSrc(next);
+  }, []);
+
+  const handleUserPlay = useCallback(() => {
+    playStartedRef.current = false;
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      maxTimeRef.current = 0;
+    }
+    void tryPlay();
+  }, [tryPlay]);
 
   return {
     hasEnded,
     hasError,
+    isPlaying,
     needsInteraction,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
-    handleCanPlay,
+    handlePlaying,
     handleUserPlay,
   };
 }
