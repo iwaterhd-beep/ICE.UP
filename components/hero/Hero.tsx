@@ -22,26 +22,18 @@ export function Hero() {
   const resetIntro = useHeroStore((state) => state.resetIntro);
 
   const {
-    phase,
     hasEnded,
     hasError,
     isPlaying,
     needsInteraction,
-    showSkip,
     isMuted,
-    brandSrc,
     cinematicSrc,
-    brandRef,
     cinematicRef,
-    handleBrandPlaying,
     handleCinematicPlaying,
-    handleBrandEnded,
     handleCinematicEnded,
-    handleBrandError,
     handleCinematicError,
     handleUserPlay,
     enableSound,
-    skipToCinematic,
   } = useHeroVideoSequence();
 
   const showEnterGate = hasEnded && !hasEntered;
@@ -100,27 +92,18 @@ export function Hero() {
           style={{ zIndex: HERO_Z_INDEX.video }}
         >
           <HeroVideo
-            phase={phase}
-            brandRef={brandRef}
             cinematicRef={cinematicRef}
-            brandSrc={brandSrc}
             cinematicSrc={cinematicSrc}
             hasEnded={hasEnded}
-            hasEntered={hasEntered}
             hasError={hasError}
             isPlaying={isPlaying}
             needsInteraction={needsInteraction}
-            showSkip={showSkip}
             showEnterGate={showEnterGate}
             isMuted={isMuted}
-            onBrandPlaying={handleBrandPlaying}
             onCinematicPlaying={handleCinematicPlaying}
-            onBrandEnded={handleBrandEnded}
             onCinematicEnded={handleCinematicEnded}
-            onBrandError={handleBrandError}
             onCinematicError={handleCinematicError}
             onUserPlay={handleUserPlay}
-            onSkip={skipToCinematic}
             onEnableSound={enableSound}
           />
         </div>
@@ -146,9 +129,7 @@ export function Hero() {
               ? ""
               : hasEnded
                 ? "bg-gradient-to-t from-black/50 via-black/5 to-black/25"
-                : phase === "cinematic"
-                  ? "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
-                  : ""
+                : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
           }`}
           style={{ zIndex: HERO_Z_INDEX.overlay }}
           initial={false}
