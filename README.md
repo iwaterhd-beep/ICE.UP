@@ -38,42 +38,53 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 
 Sin Medusa, la tienda funciona en **modo demo** con 4 productos locales.
 
-## Medusa (backend e-commerce)
+## Medusa + Railway + Vercel
 
-### 1. PostgreSQL
+Arquitectura recomendada:
 
-Opción Docker:
+| Servicio | Plataforma | Repo |
+|----------|------------|------|
+| Frontend (iceup2) | **Vercel** | `ICE.UP` |
+| Backend Medusa | **Railway** | `medusa/` en este repo |
+| PostgreSQL | Railway | (add-on) |
+| Redis | Railway | (add-on) |
 
-```bash
-docker run -d --name iceup-postgres \
-  -e POSTGRES_USER=medusa \
-  -e POSTGRES_PASSWORD=medusa \
-  -e POSTGRES_DB=medusa \
-  -p 5432:5432 postgres:16
+### 1. Railway — backend Medusa
+
+1. Crea repo en GitHub con la carpeta `iceup-medusa` y conéctalo a Railway.
+2. En el proyecto Railway, añade **PostgreSQL** y **Redis**.
+3. Crea un servicio desde el repo y usa el `Dockerfile` incluido.
+4. Variables (ver `medusa/.env.railway.example`):
+   - `DATABASE_URL=${{Postgres.DATABASE_PUBLIC_URL}}`
+   - `REDIS_URL=${{Redis.REDIS_PUBLIC_URL}}?family=0`
+   - `JWT_SECRET` y `COOKIE_SECRET` (genera con `openssl rand -hex 32`)
+   - `MEDUSA_BACKEND_URL` = dominio público de Railway
+   - `STORE_CORS` = URL de Vercel + `http://localhost:3000`
+   - `AUTH_CORS` = Vercel + backend + localhost
+5. **Generate Domain** en Railway → copia la URL.
+6. Admin: `https://tu-backend.up.railway.app/app`
+7. Settings → **Publishable API Keys** → crea key para el frontend.
+
+### 2. Vercel — frontend
+
+En el proyecto `ICE.UP`, añade variables de entorno:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://tu-dominio.vercel.app
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://tu-backend.up.railway.app
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...
 ```
 
-### 2. Crear backend
+Redeploy en Vercel tras guardar.
+
+### 3. Medusa (backend e-commerce) — local
 
 ```bash
-cd ..
-npx create-medusa-app@latest iceup-medusa
-# DATABASE_URL=postgres://medusa:medusa@localhost:5432/medusa
+cd medusa/apps/backend
+npm run dev
 ```
 
-### 3. Stripe
-
-```bash
-cd iceup-medusa
-npm install @medusajs/payment-stripe
-```
-
-Configura el provider en `medusa-config.ts` y añade `STRIPE_API_KEY` al `.env` del backend.
-
-### 4. Publishable key
-
-Medusa Admin → Settings → Publishable API Keys → crea una key y ponla en el frontend.
-
-## Assets de vídeo (Hero)
+Sin Medusa en producción, la tienda funciona en **modo demo** con productos locales.
 
 Ver `docs/hero-ffmpeg.md` para regenerar `intro-desktop.mp4`, `intro-mobile.mp4` y posters.
 
