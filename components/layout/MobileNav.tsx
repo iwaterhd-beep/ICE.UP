@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 interface MobileNavProps {
   open: boolean;
@@ -39,6 +40,9 @@ export function MobileNav({ open, onClose, links }: MobileNavProps) {
             transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             aria-label="Menú móvil"
           >
+            <Link href="/" onClick={onClose} className="mb-10 inline-flex">
+              <BrandLogo variant="wordmark" className="h-6" />
+            </Link>
             <ul className="space-y-5">
               {links.map((link, index) => (
                 <motion.li

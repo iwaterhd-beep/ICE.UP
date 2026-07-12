@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { BrandMark } from "@/components/brand/BrandMark";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { useCartStore } from "@/stores/cart-store";
 import { useHeroStore } from "@/stores/hero-store";
 import { HERO_Z_INDEX } from "@/lib/constants/hero";
-import { SITE } from "@/lib/constants/site";
 import { SiteTicker } from "./SiteTicker";
 import { MobileNav } from "./MobileNav";
 
@@ -56,12 +55,19 @@ export function Header() {
               <Link
                 href="/"
                 onClick={closeMenu}
-                className="flex items-center gap-2.5 text-ice-white"
+                className="flex items-center text-ice-white"
+                aria-label="ICE UP! — Inicio"
               >
-                <BrandMark className="h-7 w-7 md:h-8 md:w-8" />
-                <span className="font-condensed text-base font-black uppercase tracking-wide md:text-lg">
-                  {SITE.name}
-                </span>
+                <BrandLogo
+                  variant="lockup"
+                  priority
+                  className="hidden sm:inline-flex"
+                />
+                <BrandLogo
+                  variant="isotipo"
+                  priority
+                  className="inline-flex sm:hidden"
+                />
               </Link>
 
               <nav className="hidden items-center gap-6 md:flex" aria-label="Principal">

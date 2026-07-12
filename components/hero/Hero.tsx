@@ -21,14 +21,11 @@ export function Hero() {
     hasEnded,
     hasError,
     needsInteraction,
-    isPlaying,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
-    handleLoadedMetadata,
     handleCanPlay,
-    handlePlaying,
     handleUserPlay,
   } = useVideoEndFreeze();
 
@@ -80,12 +77,9 @@ export function Hero() {
             hasEnded={hasEnded}
             hasError={hasError}
             needsInteraction={needsInteraction}
-            isPlaying={isPlaying}
             onEnded={handleEnded}
             onError={handleError}
-            onLoadedMetadata={handleLoadedMetadata}
             onCanPlay={handleCanPlay}
-            onPlaying={handlePlaying}
             onUserPlay={handleUserPlay}
           />
         </div>

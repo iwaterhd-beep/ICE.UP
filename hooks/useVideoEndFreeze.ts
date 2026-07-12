@@ -11,27 +11,25 @@ interface UseVideoEndFreezeReturn {
   hasEnded: boolean;
   hasError: boolean;
   needsInteraction: boolean;
-  isPlaying: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   videoSrc: string;
   handleEnded: () => void;
   handleError: () => void;
-  handleLoadedMetadata: () => void;
   handleCanPlay: () => void;
-  handlePlaying: () => void;
   handleUserPlay: () => void;
 }
 
+const VIDEO_SOURCES = [
+  HERO_VIDEOS.mobile,
+  HERO_VIDEOS.desktop,
+  HERO_VIDEOS.fallback,
+] as const;
+
 function pickInitialSrc(): string {
-  if (typeof window === "undefined") return HERO_VIDEOS.desktop;
+  if (typeof window === "undefined") return HERO_VIDEOS.mobile;
   return window.matchMedia("(max-width: 768px)").matches
     ? HERO_VIDEOS.mobile
     : HERO_VIDEOS.desktop;
-}
-
-function buildFallbackChain(preferred: string): string[] {
-  const candidates = [preferred, HERO_VIDEOS.mobile, HERO_VIDEOS.desktop];
-  return [...new Set(candidates)];
 }
 
 export function useVideoEndFreeze(
@@ -39,35 +37,25 @@ export function useVideoEndFreeze(
 ): UseVideoEndFreezeReturn {
   const { onError } = options;
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const startedRef = useRef(false);
-  const fallbackIndexRef = useRef(0);
+  const sourceIndexRef = useRef(0);
+  const playAttemptedRef = useRef(false);
 
-  const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEOS.desktop);
-  const [fallbackChain, setFallbackChain] = useState<string[]>(() =>
-    buildFallbackChain(HERO_VIDEOS.desktop),
-  );
+  const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEOS.mobile);
   const [hasEnded, setHasEnded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    const preferred = pickInitialSrc();
-    setVideoSrc(preferred);
-    setFallbackChain(buildFallbackChain(preferred));
-    fallbackIndexRef.current = 0;
-    startedRef.current = false;
-    setIsPlaying(false);
-  }, []);
 
   const finishIntro = useCallback(() => {
     setHasEnded(true);
     setNeedsInteraction(false);
   }, []);
 
-  const tryAutoplay = useCallback(async () => {
+  const tryPlay = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || startedRef.current || hasError) return;
+    if (!video || hasEnded || hasError) return;
+
+    video.muted = true;
+    video.playsInline = true;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -84,95 +72,93 @@ export function useVideoEndFreeze(
 
     try {
       await video.play();
-      startedRef.current = true;
+      playAttemptedRef.current = true;
       setNeedsInteraction(false);
     } catch {
-      startedRef.current = false;
+      playAttemptedRef.current = false;
       setNeedsInteraction(true);
     }
-  }, [finishIntro, hasError]);
+  }, [finishIntro, hasEnded, hasError]);
+
+  useEffect(() => {
+    sourceIndexRef.current = 0;
+    playAttemptedRef.current = false;
+    setVideoSrc(pickInitialSrc());
+    setHasEnded(false);
+    setHasError(false);
+    setNeedsInteraction(false);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (hasEnded || hasError) return;
+
+    const unlockTimer = window.setTimeout(() => {
+      if (!playAttemptedRef.current) {
+        finishIntro();
+        setNeedsInteraction(true);
+      }
+    }, 9000);
+
+    return () => window.clearTimeout(unlockTimer);
+  }, [videoSrc, hasEnded, hasError, finishIntro]);
 
   const handleEnded = useCallback(() => {
     finishIntro();
   }, [finishIntro]);
 
-  const advanceFallback = useCallback(() => {
-    const nextIndex = fallbackIndexRef.current + 1;
-    if (nextIndex >= fallbackChain.length) {
+  const handleError = useCallback(() => {
+    const nextIndex = sourceIndexRef.current + 1;
+    if (nextIndex >= VIDEO_SOURCES.length) {
       setHasError(true);
       finishIntro();
       onError?.();
-      return false;
+      return;
     }
 
-    fallbackIndexRef.current = nextIndex;
-    startedRef.current = false;
-    setIsPlaying(false);
-    setVideoSrc(fallbackChain[nextIndex]!);
-    return true;
-  }, [fallbackChain, finishIntro, onError]);
-
-  const handleError = useCallback(() => {
-    if (advanceFallback()) return;
-  }, [advanceFallback]);
-
-  const handleLoadedMetadata = useCallback(() => {
-    void tryAutoplay();
-  }, [tryAutoplay]);
+    sourceIndexRef.current = nextIndex;
+    playAttemptedRef.current = false;
+    setVideoSrc(VIDEO_SOURCES[nextIndex]!);
+  }, [finishIntro, onError]);
 
   const handleCanPlay = useCallback(() => {
-    void tryAutoplay();
-  }, [tryAutoplay]);
-
-  const handlePlaying = useCallback(() => {
-    setIsPlaying(true);
-    setNeedsInteraction(false);
-  }, []);
+    void tryPlay();
+  }, [tryPlay]);
 
   const handleUserPlay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    void video
-      .play()
-      .then(() => {
-        startedRef.current = true;
-        setNeedsInteraction(false);
-        setIsPlaying(true);
-      })
-      .catch(() => {
-        setNeedsInteraction(true);
-      });
-  }, []);
+    void tryPlay();
+  }, [tryPlay]);
 
   useEffect(() => {
     if (!needsInteraction) return;
 
-    const onFirstInteraction = () => {
-      handleUserPlay();
+    const onInteract = () => {
+      void tryPlay();
     };
 
-    window.addEventListener("pointerdown", onFirstInteraction, { once: true });
-    window.addEventListener("keydown", onFirstInteraction, { once: true });
+    window.addEventListener("pointerdown", onInteract, { once: true });
+    window.addEventListener("keydown", onInteract, { once: true });
 
     return () => {
-      window.removeEventListener("pointerdown", onFirstInteraction);
-      window.removeEventListener("keydown", onFirstInteraction);
+      window.removeEventListener("pointerdown", onInteract);
+      window.removeEventListener("keydown", onInteract);
     };
-  }, [needsInteraction, handleUserPlay]);
+  }, [needsInteraction, tryPlay]);
 
   return {
     hasEnded,
     hasError,
     needsInteraction,
-    isPlaying,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
-    handleLoadedMetadata,
     handleCanPlay,
-    handlePlaying,
     handleUserPlay,
   };
 }

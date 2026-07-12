@@ -1,8 +1,9 @@
 export const HERO_VIDEOS = {
-  /** 1920p CRF 16 + faststart — alta calidad, carga fiable en CDN */
+  /** 1920p CRF 16 + faststart */
   desktop: "/videos/intro-desktop.mp4",
-  /** 1080p CRF 17 — móvil */
+  /** 1080p CRF 17 — carga más rápida, primer intento en móvil */
   mobile: "/videos/intro-mobile.mp4",
+  /** Respaldo ligero por si falla desktop */
   fallback: "/videos/intro-mobile.mp4",
 } as const;
 
