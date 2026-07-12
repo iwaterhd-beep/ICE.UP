@@ -6,6 +6,7 @@ interface HeroVideoProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   videoSrc: string;
   hasEnded: boolean;
+  hasEntered: boolean;
   hasError: boolean;
   isPlaying: boolean;
   needsInteraction: boolean;
@@ -20,6 +21,7 @@ export function HeroVideo({
   videoRef,
   videoSrc,
   hasEnded,
+  hasEntered,
   hasError,
   isPlaying,
   needsInteraction,
@@ -68,11 +70,15 @@ export function HeroVideo({
         key={videoSrc}
         ref={videoRef}
         src={videoSrc}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-          showEnterGate ? "pointer-events-none opacity-0" : ""
-        } ${
+        className={`absolute inset-0 h-full w-full object-cover ${
+          showEnterGate
+            ? "pointer-events-none scale-[1.02] opacity-0"
+            : hasEntered && hasEnded
+              ? "scale-100 opacity-100"
+              : "opacity-100"
+        } transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           hasEnded && !showEnterGate
-            ? "brightness-[1.08] contrast-[1.1] saturate-[1.2]"
+            ? "brightness-[1.06] contrast-[1.08] saturate-[1.15]"
             : "brightness-100 contrast-100 saturate-100"
         }`}
         autoPlay={!hasEnded}

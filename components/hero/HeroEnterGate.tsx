@@ -16,20 +16,21 @@ export function HeroEnterGate() {
       className="absolute inset-0 z-20 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: LUXURY_EASE }}
+      exit={{ opacity: 0, scale: 1.02 }}
+      transition={{ duration: 0.7, ease: LUXURY_EASE }}
     >
       <motion.button
         type="button"
         onClick={enterSite}
         aria-label="Entrar en ICE UP!"
-        className="relative z-10 cursor-pointer border-0 bg-transparent p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-ice-white"
+        className="relative z-10 cursor-pointer border-0 bg-transparent p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-ice-black"
         initial={{ opacity: 0, scale: 0.88, y: 16 }}
         animate={{
           opacity: 1,
           scale: 1,
-          y: [0, -16, 0],
+          y: [0, -14, 0],
         }}
+        exit={{ opacity: 0, scale: 0.9, y: -8, transition: { duration: 0.55, ease: LUXURY_EASE } }}
         transition={{
           opacity: { duration: 1, ease: LUXURY_EASE },
           scale: { duration: 1, ease: LUXURY_EASE },

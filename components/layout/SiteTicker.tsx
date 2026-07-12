@@ -3,11 +3,17 @@
 import { motion } from "framer-motion";
 import { TICKER_ITEMS } from "@/lib/constants/palace-copy";
 
-export function SiteTicker() {
+export function SiteTicker({ glass = false }: { glass?: boolean }) {
   const track = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
-    <div className="overflow-hidden border-t border-ice-gray-800 bg-ice-black">
+    <div
+      className={`overflow-hidden border-t ${
+        glass
+          ? "border-white/10 bg-black/35 backdrop-blur-md"
+          : "border-ice-gray-800 bg-ice-black"
+      }`}
+    >
       <motion.div
         className="flex w-max gap-0 whitespace-nowrap py-2.5"
         animate={{ x: ["0%", "-50%"] }}

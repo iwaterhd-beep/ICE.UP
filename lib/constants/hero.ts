@@ -13,7 +13,6 @@ export const HERO_POSTER = {
 } as const;
 
 export const HERO_CONTENT = {
-  subtitle: "Drop activo — Hood's Château + Logo Tees",
   cta: "Ver colección",
   ctaTarget: "/coleccion",
 } as const;

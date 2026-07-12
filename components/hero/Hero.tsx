@@ -2,11 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import {
+  AnimatePresence,
+  motion,
   useMotionValueEvent,
   useScroll,
   useTransform,
 } from "framer-motion";
 import { useVideoEndFreeze } from "@/hooks/useVideoEndFreeze";
+import { LUXURY_EASE } from "@/lib/constants/animation";
 import { HERO_Z_INDEX } from "@/lib/constants/hero";
 import { useHeroStore } from "@/stores/hero-store";
 import { HeroContent } from "./HeroContent";
@@ -90,6 +93,7 @@ export function Hero() {
             videoRef={videoRef}
             videoSrc={videoSrc}
             hasEnded={hasEnded}
+            hasEntered={hasEntered}
             hasError={hasError}
             isPlaying={isPlaying}
             needsInteraction={needsInteraction}
@@ -101,23 +105,33 @@ export function Hero() {
           />
         </div>
 
-        {showEnterGate && (
-          <div
-            className="absolute inset-0 bg-white/25 transition-opacity duration-700"
-            style={{ zIndex: HERO_Z_INDEX.overlay }}
-            aria-hidden="true"
-          />
-        )}
+        <AnimatePresence>
+          {showEnterGate && (
+            <motion.div
+              key="enter-overlay"
+              className="absolute inset-0 bg-white/25"
+              style={{ zIndex: HERO_Z_INDEX.overlay }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.85, ease: LUXURY_EASE }}
+              aria-hidden="true"
+            />
+          )}
+        </AnimatePresence>
 
-        <div
-          className={`pointer-events-none absolute inset-0 transition-opacity duration-1000 ${
+        <motion.div
+          className={`pointer-events-none absolute inset-0 ${
             showEnterGate
-              ? "opacity-0"
+              ? ""
               : hasEnded
-                ? "bg-gradient-to-t from-black/35 via-transparent to-transparent"
+                ? "bg-gradient-to-t from-black/50 via-black/5 to-black/25"
                 : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
           }`}
           style={{ zIndex: HERO_Z_INDEX.overlay }}
+          initial={false}
+          animate={{ opacity: showEnterGate ? 0 : 1 }}
+          transition={{ duration: 0.9, ease: LUXURY_EASE, delay: showEnterGate ? 0 : 0.15 }}
           aria-hidden="true"
         />
 

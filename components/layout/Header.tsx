@@ -27,6 +27,7 @@ export function Header() {
 
   const isHome = pathname === "/";
   const isVisible = !isHome || hasEntered;
+  const heroGlass = isHome && hasEntered && !scrolled && !menuOpen;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -42,12 +43,14 @@ export function Header() {
       <AnimatePresence>
         {isVisible && (
           <motion.header
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-            className={`fixed inset-x-0 top-0 border-b border-ice-gray-800 bg-ice-black ${
-              isHome && !scrolled && !menuOpen ? "" : ""
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className={`fixed inset-x-0 top-0 transition-[background-color,border-color,backdrop-filter] duration-500 ${
+              heroGlass
+                ? "border-b border-white/10 bg-gradient-to-b from-black/75 via-black/40 to-transparent backdrop-blur-sm"
+                : "border-b border-ice-gray-800 bg-ice-black"
             }`}
             style={{ zIndex: HERO_Z_INDEX.nav }}
           >
@@ -102,7 +105,7 @@ export function Header() {
                 </button>
               </div>
             </div>
-            <SiteTicker />
+            <SiteTicker glass={heroGlass} />
           </motion.header>
         )}
       </AnimatePresence>
