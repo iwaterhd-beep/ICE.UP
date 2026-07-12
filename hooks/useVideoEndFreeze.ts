@@ -11,11 +11,14 @@ interface UseVideoEndFreezeReturn {
   hasEnded: boolean;
   hasError: boolean;
   needsInteraction: boolean;
+  isPlaying: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   videoSrc: string;
   handleEnded: () => void;
   handleError: () => void;
   handleLoadedMetadata: () => void;
+  handleCanPlay: () => void;
+  handlePlaying: () => void;
   handleUserPlay: () => void;
 }
 
@@ -27,13 +30,8 @@ function pickInitialSrc(): string {
 }
 
 function buildFallbackChain(preferred: string): string[] {
-  const ordered = [
-    preferred,
-    HERO_VIDEOS.desktop,
-    HERO_VIDEOS.mobile,
-    HERO_VIDEOS.fallback,
-  ];
-  return [...new Set(ordered)];
+  const candidates = [preferred, HERO_VIDEOS.mobile, HERO_VIDEOS.desktop];
+  return [...new Set(candidates)];
 }
 
 export function useVideoEndFreeze(
@@ -51,6 +49,7 @@ export function useVideoEndFreeze(
   const [hasEnded, setHasEnded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const preferred = pickInitialSrc();
@@ -58,6 +57,7 @@ export function useVideoEndFreeze(
     setFallbackChain(buildFallbackChain(preferred));
     fallbackIndexRef.current = 0;
     startedRef.current = false;
+    setIsPlaying(false);
   }, []);
 
   const finishIntro = useCallback(() => {
@@ -67,7 +67,7 @@ export function useVideoEndFreeze(
 
   const tryAutoplay = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || startedRef.current) return;
+    if (!video || startedRef.current || hasError) return;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -90,7 +90,7 @@ export function useVideoEndFreeze(
       startedRef.current = false;
       setNeedsInteraction(true);
     }
-  }, [finishIntro]);
+  }, [finishIntro, hasError]);
 
   const handleEnded = useCallback(() => {
     finishIntro();
@@ -107,6 +107,7 @@ export function useVideoEndFreeze(
 
     fallbackIndexRef.current = nextIndex;
     startedRef.current = false;
+    setIsPlaying(false);
     setVideoSrc(fallbackChain[nextIndex]!);
     return true;
   }, [fallbackChain, finishIntro, onError]);
@@ -119,6 +120,15 @@ export function useVideoEndFreeze(
     void tryAutoplay();
   }, [tryAutoplay]);
 
+  const handleCanPlay = useCallback(() => {
+    void tryAutoplay();
+  }, [tryAutoplay]);
+
+  const handlePlaying = useCallback(() => {
+    setIsPlaying(true);
+    setNeedsInteraction(false);
+  }, []);
+
   const handleUserPlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -128,6 +138,7 @@ export function useVideoEndFreeze(
       .then(() => {
         startedRef.current = true;
         setNeedsInteraction(false);
+        setIsPlaying(true);
       })
       .catch(() => {
         setNeedsInteraction(true);
@@ -154,11 +165,14 @@ export function useVideoEndFreeze(
     hasEnded,
     hasError,
     needsInteraction,
+    isPlaying,
     videoRef,
     videoSrc,
     handleEnded,
     handleError,
     handleLoadedMetadata,
+    handleCanPlay,
+    handlePlaying,
     handleUserPlay,
   };
 }

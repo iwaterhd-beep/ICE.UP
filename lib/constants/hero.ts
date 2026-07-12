@@ -1,9 +1,9 @@
 export const HERO_VIDEOS = {
-  /** Fuente nativa 2560×1440 — máxima calidad en desktop */
-  desktop: "/videos/ice-source.mp4",
-  /** 1080p CRF 17 — alta calidad en móvil sin el peso del master */
+  /** 1920p CRF 16 + faststart — alta calidad, carga fiable en CDN */
+  desktop: "/videos/intro-desktop.mp4",
+  /** 1080p CRF 17 — móvil */
   mobile: "/videos/intro-mobile.mp4",
-  fallback: "/videos/ice-source.mp4",
+  fallback: "/videos/intro-mobile.mp4",
 } as const;
 
 export const HERO_POSTER = {
