@@ -8,45 +8,45 @@ export interface AtelierPhase {
 export const ATELIER_INTRO = {
   designerName: "El Chico de Hielo",
   portrait: "/atelier/designer.jpg",
-  headline: "Donde el frío se vuelve forma",
+  headline: "Del packaging a la calle",
   paragraphs: [
-    "Cada pieza ICE UP! nace en un espacio de silencio. Sin producción en masa, sin prisa. Solo manos, aguja e intención.",
-    "El Chico de Hielo — así conocen al diseñador detrás de la marca — trabaja como un artesano del norte: observa el material, escucha lo que pide, y cose hasta que la prenda respira sola.",
+    "ICE UP! no empieza en una pasarela. Empieza en una bolsa iridiscente, en una camiseta colgando de una canasta, en una esquina cualquiera de la ciudad.",
+    "El Chico de Hielo diseña piezas que existen en el mundo real — no en un render. Cada drop se documenta, se archiva, y se libera en lotes limitados.",
   ],
 } as const;
 
 export const ATELIER_PHASES: AtelierPhase[] = [
   {
-    id: "boceto",
-    title: "Boceto",
+    id: "concepto",
+    title: "Concepto gráfico",
     description:
-      "Todo empieza en papel. Líneas rápidas, proporciones probadas a mano alzada. No hay CAD ni render previo — solo la intuición del cuerpo y el peso del tejido.",
+      "Identidad visual del drop: tipografía líquida, acabados holográficos, copy con actitud. El packaging es la primera pieza que ves.",
     image: "/atelier/process-1.jpg",
   },
   {
-    id: "patronaje",
-    title: "Patronaje",
+    id: "produccion",
+    title: "Producción",
     description:
-      "El patrón se construye pieza a pieza sobre maniquí de draping. Cada curva se ajusta durante días hasta encontrar la tensión exacta entre estructura y caída.",
+      "Selección de blanks, parches bordados, serigrafía de alta densidad. Cada unidad pasa control de calidad manual.",
     image: "/atelier/process-2.jpg",
   },
   {
-    id: "cosido",
-    title: "Cosido a mano",
+    id: "campana",
+    title: "Campaña",
     description:
-      "Las costuras interiores se refuerzan con hilo de seda. Las exteriores, cuando existen, quedan visibles como cicatriz honesta del proceso artesanal.",
+      "Fotografía en entorno urbano. Canastas, aceras, luz natural. La prenda se presenta donde vive — en la calle.",
     image: "/atelier/process-3.jpg",
   },
   {
-    id: "acabado",
-    title: "Acabado",
+    id: "drop",
+    title: "Drop",
     description:
-      "Revisión final bajo luz natural. Cada prenda pasa por manos del diseñador antes de recibir el sello ICE UP! — garantía de que ninguna unidad es igual a otra.",
+      "Lanzamiento en edición limitada. Lo que no coges hoy, mañana es archivo. Sin reposición, sin stock masivo.",
     image: "/atelier/process-4.jpg",
   },
 ];
 
 export const ATELIER_QUOTE = {
-  text: "No diseño ropa para cubrir cuerpos. Diseño armaduras de calma para quienes caminan entre el frío y la ciudad.",
+  text: "No hacemos ropa para guardar en cajón. Hacemos piezas para salir, moverse, y quemar el asfalto.",
   texture: "/atelier/texture.jpg",
 } as const;

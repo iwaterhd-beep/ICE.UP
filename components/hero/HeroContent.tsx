@@ -59,7 +59,7 @@ export function HeroContent({ hasEnded, contentOpacity }: HeroContentProps) {
             <motion.div variants={itemVariants} className="mt-10">
               <a
                 href={HERO_CONTENT.ctaTarget}
-                aria-label={`${HERO_CONTENT.cta} — ir al archivo de la marca`}
+                aria-label={`${HERO_CONTENT.cta} — ir a la tienda`}
                 className="inline-block bg-ice-white px-10 py-4 font-condensed text-xs font-black uppercase tracking-wide text-ice-black transition-opacity hover:opacity-85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ice-white"
               >
                 {HERO_CONTENT.cta}

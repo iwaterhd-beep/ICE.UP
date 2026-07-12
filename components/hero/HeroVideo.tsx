@@ -45,9 +45,9 @@ export function HeroVideo({
         key={videoSrc}
         ref={videoRef}
         src={videoSrc}
-        className={`h-full w-full origin-center object-cover transition-[filter] duration-1000 ${
+        className={`absolute inset-0 h-full w-full origin-center object-cover transition-[filter] duration-1000 [transform:translateZ(0)] [backface-visibility:hidden] ${
           hasEnded
-            ? "brightness-[1.12] contrast-[1.15] saturate-[1.35]"
+            ? "brightness-[1.08] contrast-[1.1] saturate-[1.2]"
             : "brightness-100 contrast-100 saturate-100"
         }`}
         autoPlay

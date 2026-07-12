@@ -14,73 +14,73 @@ const archiveEntries: ArchiveEntry[] = [
     id: "001",
     year: 2024,
     collectionName: "Gélido Origins",
-    title: "Primera manifestación",
+    title: "Packaging Dopamine Hit",
     description:
-      "Las primeras piezas nacidas del bosque. Siluetas oversized, costuras visibles, lana cruda.",
+      "Primer packaging del drop. Gráfico yeti, acabado holográfico, secuencia Dopamine Hit → Gear On → ICE UP!",
     extendedDescription:
-      "Gélido Origins marcó el nacimiento de ICE UP! como lenguaje visual. Cada prenda fue confeccionada en el atelier de El Chico de Hielo, con materiales seleccionados a mano en lotes limitados. La colección exploró la tensión entre protección y vulnerabilidad — capas que envuelven sin ocultar.",
-    images: ["/archive/entry-1.jpg", "/archive/entry-2.jpg"],
-    tags: ["debut", "outerwear"],
+      "El packaging ICE UP! nació como objeto coleccionable, no como mero envoltorio. Cada bolsa iridiscente documenta el ritual del drop: abrir, vestir, activar. Pieza de archivo desde el primer lote.",
+    images: ["/archive/entry-1.jpg"],
+    tags: ["packaging", "drop"],
   },
   {
     id: "002",
     year: 2024,
     collectionName: "Gélido Origins",
-    title: "Capa de niebla",
+    title: "Logo Tee Crema",
     description:
-      "Abrigo estructural en negro profundo. Forro de seda técnica, cierre oculto.",
+      "Camiseta crema con parche logo en pecho. Primeras unidades fotografiadas en exteriores urbanos.",
     extendedDescription:
-      "La Capa de niebla se convirtió en pieza icónica de la marca. Su construcción requiere más de cuarenta horas de trabajo manual. El corte asimétrico evoca la topografía de un paisaje helado visto desde la distancia.",
+      "La Logo Tee Crema estableció el código visual mínimo de la marca: tipografía contenida, parche cuadrado, silueta relaxed. Fotografiada en entorno urbano con luz natural.",
     images: ["/archive/entry-2.jpg"],
-    tags: ["icono", "abrigos"],
+    tags: ["essentials", "logo"],
   },
   {
     id: "003",
     year: 2025,
     collectionName: "Permafrost",
-    title: "Edición Permafrost",
+    title: "Duo — Logo Tees",
     description:
-      "Segunda entrega. Texturas granuladas, paleta reducida, bordes sin rematar.",
+      "Sesión Permafrost. Negro y crema en contraste. Dos piezas, un mismo código.",
     extendedDescription:
-      "Permafrost profundizó la investigación material de la casa. Tejidos tratados con procesos artesanales de encogimiento controlado, bordes sin rematar que revelan la estructura interna de cada prenda. Solo doce unidades por modelo.",
-    images: ["/archive/entry-3.jpg", "/archive/entry-4.jpg"],
-    tags: ["limitada", "texturas"],
+      "Lookbook de la entrega Permafrost: negro profundo frente a crema neutra. Misma construcción, distinta actitud. Documentado en exteriores con arquitectura brutalista de fondo.",
+    images: ["/archive/entry-3.jpg"],
+    tags: ["lookbook", "duo"],
   },
   {
     id: "004",
     year: 2025,
     collectionName: "Permafrost",
-    title: "Traje de calma",
+    title: "Hood's Château — Canasta",
     description:
-      "Conjunto de dos piezas. Líneas rectas, hombros caídos, ausencia de ornamentos.",
+      "Camiseta gráfica colgada en canasta de cadena. Campaña urbana, luz dorada.",
     extendedDescription:
-      "El Traje de calma fue diseñado como segunda piel para el invierno urbano. Patronaje desarrollado durante tres meses de pruebas sobre cuerpos reales. Cada costura interior está reforzada a mano con hilo de seda.",
+      "Hood's Château se presentó colgando de una canasta de baloncesto — referencia directa a la cultura callejera. El gráfico yeti en butaca roja se convirtió en pieza central del archivo visual ICE UP!",
     images: ["/archive/entry-4.jpg"],
-    tags: ["tailoring", "unisex"],
+    tags: ["campaign", "graphic tee"],
   },
   {
     id: "005",
     year: 2026,
     collectionName: "Invierno",
-    title: "Nueva colección invierno",
+    title: "Bolsa Melt Ice",
     description:
-      "La entrega actual. Referencias al paisaje del vídeo inaugural — bosque, tienda, luz.",
+      '"The content of this bag is so hot it can melt ice." Packaging de la colección Invierno.',
     extendedDescription:
-      "La colección Invierno 2026 cierra el ciclo narrativo iniciado en el bosque nevado. Piezas que dialogan con la arquitectura minimalista y la luz tenue del crepúsculo polar. Disponible progresivamente en la tienda.",
-    images: ["/archive/entry-5.jpg", "/archive/entry-6.jpg"],
-    tags: ["actual", "invierno"],
+      "La bolsa Melt Ice cerró el ciclo narrativo del invierno 2026: tipografía líquida, estrellas iridiscentes, fondo cosmos. Objeto de archivo y extensión de la identidad gráfica de la marca.",
+    images: ["/archive/entry-5.jpg"],
+    tags: ["packaging", "invierno"],
   },
   {
     id: "006",
     year: 2026,
     collectionName: "Invierno",
-    title: "Monolito negro",
+    title: "Campaña calle",
     description:
-      "Parka estructural inspirada en la fachada de la tienda. Logo bordado a mano.",
+      "Lookbook urbano. Capas, cargo, energía de ciudad. ICE UP! en movimiento.",
     extendedDescription:
-      "Monolito negro es la pieza central de la campaña. El bordado del logotipo ICE UP! requiere seis horas de trabajo por unidad. La silueta evoca un volumen arquitectónico — protección total, presencia silenciosa.",
-    images: ["/archive/entry-6.jpg"],
-    tags: ["hero piece", "bordado"],
+      "La campaña de calle documenta ICE UP! fuera del estudio: denim ancho, capas técnicas, entorno metropolitano. La marca en contexto real — no posado, en tránsito.",
+    images: ["/archive/entry-6.png"],
+    tags: ["lookbook", "street"],
   },
 ];
 
