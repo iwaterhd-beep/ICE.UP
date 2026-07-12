@@ -5,9 +5,14 @@ import { Archive } from "@/components/archive";
 import { Atelier } from "@/components/atelier";
 import { CollectionTeaser } from "@/components/shop";
 import { LUXURY_EASE } from "@/lib/constants/animation";
+import type { StorefrontProduct } from "@/lib/medusa/types";
 import { useHeroStore } from "@/stores/hero-store";
 
-export function HomeSections() {
+interface HomeSectionsProps {
+  recentProducts: StorefrontProduct[];
+}
+
+export function HomeSections({ recentProducts }: HomeSectionsProps) {
   const hasEntered = useHeroStore((state) => state.hasEntered);
 
   if (!hasEntered) return null;
@@ -18,9 +23,9 @@ export function HomeSections() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, ease: LUXURY_EASE, delay: 0.65 }}
     >
+      <CollectionTeaser products={recentProducts} />
       <Archive />
       <Atelier />
-      <CollectionTeaser />
     </motion.div>
   );
 }

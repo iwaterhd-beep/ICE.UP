@@ -12,9 +12,9 @@ import { SiteTicker } from "./SiteTicker";
 import { MobileNav } from "./MobileNav";
 
 const NAV_LINKS = [
+  { href: "/#coleccion", label: "Colección" },
   { href: "/#archivo", label: "Archivo" },
   { href: "/#atelier", label: "Atelier" },
-  { href: "/coleccion", label: "Colección" },
 ];
 
 export function Header() {

@@ -8,7 +8,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useVideoEndFreeze } from "@/hooks/useVideoEndFreeze";
+import { useHeroVideoSequence } from "@/hooks/useHeroVideoSequence";
 import { LUXURY_EASE } from "@/lib/constants/animation";
 import { HERO_Z_INDEX } from "@/lib/constants/hero";
 import { useHeroStore } from "@/stores/hero-store";
@@ -22,17 +22,25 @@ export function Hero() {
   const resetIntro = useHeroStore((state) => state.resetIntro);
 
   const {
+    phase,
     hasEnded,
     hasError,
     isPlaying,
     needsInteraction,
-    videoRef,
-    videoSrc,
-    handleEnded,
-    handleError,
-    handlePlaying,
+    showSkip,
+    brandSrc,
+    cinematicSrc,
+    brandRef,
+    cinematicRef,
+    handleBrandPlaying,
+    handleCinematicPlaying,
+    handleBrandEnded,
+    handleCinematicEnded,
+    handleBrandError,
+    handleCinematicError,
     handleUserPlay,
-  } = useVideoEndFreeze();
+    skipToCinematic,
+  } = useHeroVideoSequence();
 
   const showEnterGate = hasEnded && !hasEntered;
 
@@ -66,13 +74,13 @@ export function Hero() {
   }, [hasEntered]);
 
   useMotionValueEvent(videoScale, "change", (scale) => {
-    const video = videoRef.current;
+    const video = cinematicRef.current;
     if (!video || !hasEntered) return;
     video.style.transform = `scale(${scale})`;
   });
 
   useMotionValueEvent(videoOpacity, "change", (opacity) => {
-    const video = videoRef.current;
+    const video = cinematicRef.current;
     if (!video || !hasEntered) return;
     video.style.opacity = String(opacity);
   });
@@ -90,18 +98,26 @@ export function Hero() {
           style={{ zIndex: HERO_Z_INDEX.video }}
         >
           <HeroVideo
-            videoRef={videoRef}
-            videoSrc={videoSrc}
+            phase={phase}
+            brandRef={brandRef}
+            cinematicRef={cinematicRef}
+            brandSrc={brandSrc}
+            cinematicSrc={cinematicSrc}
             hasEnded={hasEnded}
             hasEntered={hasEntered}
             hasError={hasError}
             isPlaying={isPlaying}
             needsInteraction={needsInteraction}
+            showSkip={showSkip}
             showEnterGate={showEnterGate}
-            onEnded={handleEnded}
-            onError={handleError}
-            onPlaying={handlePlaying}
+            onBrandPlaying={handleBrandPlaying}
+            onCinematicPlaying={handleCinematicPlaying}
+            onBrandEnded={handleBrandEnded}
+            onCinematicEnded={handleCinematicEnded}
+            onBrandError={handleBrandError}
+            onCinematicError={handleCinematicError}
             onUserPlay={handleUserPlay}
+            onSkip={skipToCinematic}
           />
         </div>
 
@@ -126,7 +142,9 @@ export function Hero() {
               ? ""
               : hasEnded
                 ? "bg-gradient-to-t from-black/50 via-black/5 to-black/25"
-                : "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
+                : phase === "cinematic"
+                  ? "bg-gradient-to-t from-black/60 via-black/10 to-black/20"
+                  : ""
           }`}
           style={{ zIndex: HERO_Z_INDEX.overlay }}
           initial={false}

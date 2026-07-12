@@ -18,16 +18,24 @@ export function HeroContent({ hasEnded, contentOpacity }: HeroContentProps) {
 
   return (
     <motion.div
-      className="relative z-20 h-full w-full"
+      className="pointer-events-none relative z-20 h-full w-full"
       style={{ opacity: showEnterGate ? 1 : contentOpacity }}
     >
       <h1 className="sr-only">{SITE.name}</h1>
 
       <AnimatePresence mode="wait">
-        {showEnterGate && <HeroEnterGate key="enter-gate" />}
+        {showEnterGate && (
+          <div className="pointer-events-auto">
+            <HeroEnterGate key="enter-gate" />
+          </div>
+        )}
       </AnimatePresence>
 
-      {showLanding && <HeroLanding />}
+      {showLanding && (
+        <div className="pointer-events-auto">
+          <HeroLanding />
+        </div>
+      )}
     </motion.div>
   );
 }
