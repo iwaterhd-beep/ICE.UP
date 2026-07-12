@@ -18,7 +18,7 @@ run([
   "-y", "-i", brandSrc,
   "-c:v", "libx264", "-profile:v", "main", "-pix_fmt", "yuv420p",
   "-crf", "23", "-preset", "slow", "-vf", "scale=720:-2:flags=lanczos",
-  "-an", "-movflags", "+faststart",
+  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart",
   path.join(root, "public/videos/intro-brand-desktop.mp4"),
 ]);
 
@@ -26,7 +26,7 @@ run([
   "-y", "-i", brandSrc,
   "-c:v", "libx264", "-profile:v", "main", "-pix_fmt", "yuv420p",
   "-crf", "24", "-preset", "slow", "-vf", "scale=576:-2:flags=lanczos",
-  "-an", "-movflags", "+faststart",
+  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart",
   path.join(root, "public/videos/intro-brand-mobile.mp4"),
 ]);
 
@@ -35,7 +35,7 @@ run([
   "-y", "-i", cinematicSrc,
   "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
   "-crf", "16", "-preset", "slow", "-vf", "scale=1920:-2:flags=lanczos",
-  "-an", "-movflags", "+faststart",
+  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart",
   path.join(root, "public/videos/intro-cinematic-desktop.mp4"),
 ]);
 
@@ -43,7 +43,7 @@ run([
   "-y", "-i", cinematicSrc,
   "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
   "-crf", "17", "-preset", "slow", "-vf", "scale=1080:-2:flags=lanczos",
-  "-an", "-movflags", "+faststart",
+  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart",
   path.join(root, "public/videos/intro-cinematic-mobile.mp4"),
 ]);
 

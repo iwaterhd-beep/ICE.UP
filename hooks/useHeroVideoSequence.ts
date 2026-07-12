@@ -15,6 +15,7 @@ interface UseHeroVideoSequenceReturn {
   isPlaying: boolean;
   needsInteraction: boolean;
   showSkip: boolean;
+  isMuted: boolean;
   brandSrc: string;
   cinematicSrc: string;
   brandRef: React.RefObject<HTMLVideoElement | null>;
@@ -26,6 +27,7 @@ interface UseHeroVideoSequenceReturn {
   handleBrandError: () => void;
   handleCinematicError: () => void;
   handleUserPlay: () => void;
+  enableSound: () => void;
   skipToCinematic: () => void;
 }
 
@@ -61,34 +63,71 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(false);
   const [showSkip, setShowSkip] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const soundEnabledRef = useRef(false);
 
   const setPhaseSafe = useCallback((next: HeroVideoPhase) => {
     phaseRef.current = next;
     setPhase(next);
   }, []);
 
-  const playCinematic = useCallback(async () => {
-    const video = cinematicRef.current;
-    if (!video || hasEnded) return false;
-
-    video.muted = true;
-    video.playsInline = true;
-    video.loop = false;
-
-    try {
-      await video.play();
-      setNeedsInteraction(false);
-      setIsPlaying(true);
-      return true;
-    } catch {
-      setNeedsInteraction(true);
-      return false;
+  const applySoundToVideos = useCallback((muted: boolean) => {
+    for (const video of [brandRef.current, cinematicRef.current]) {
+      if (!video) continue;
+      video.muted = muted;
+      video.volume = muted ? 0 : 1;
     }
-  }, [hasEnded]);
+    setIsMuted(muted);
+    soundEnabledRef.current = !muted;
+  }, []);
+
+  const enableSound = useCallback(() => {
+    applySoundToVideos(false);
+  }, [applySoundToVideos]);
+
+  const playCinematic = useCallback(
+    async (withSound = false) => {
+      const video = cinematicRef.current;
+      if (!video || hasEnded) return false;
+
+      const useSound = withSound || soundEnabledRef.current;
+      video.muted = !useSound;
+      video.volume = useSound ? 1 : 0;
+      video.playsInline = true;
+      video.loop = false;
+      setIsMuted(!useSound);
+
+      try {
+        await video.play();
+        setNeedsInteraction(false);
+        setIsPlaying(true);
+        return true;
+      } catch {
+        if (useSound) {
+          video.muted = true;
+          video.volume = 0;
+          setIsMuted(true);
+          try {
+            await video.play();
+            setNeedsInteraction(false);
+            setIsPlaying(true);
+            return true;
+          } catch {
+            setNeedsInteraction(true);
+            return false;
+          }
+        }
+        setNeedsInteraction(true);
+        return false;
+      }
+    },
+    [hasEnded],
+  );
 
   const skipToCinematic = useCallback(() => {
     if (phaseRef.current !== "brand" || transitioningRef.current || hasEnded) return;
 
+    enableSound();
     transitioningRef.current = true;
     setShowSkip(false);
     setPhaseSafe("transition");
@@ -107,22 +146,38 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
       transitioningRef.current = false;
       void playCinematic();
     }, HERO_SKIP.transitionMs);
-  }, [hasEnded, playCinematic, setPhaseSafe]);
+  }, [hasEnded, playCinematic, setPhaseSafe, enableSound]);
 
-  const tryPlayBrand = useCallback(async () => {
+  const tryPlayBrand = useCallback(async (withSound = false) => {
     const video = brandRef.current;
     if (!video || phaseRef.current !== "brand" || transitioningRef.current) return;
 
-    video.muted = true;
+    const useSound = withSound || soundEnabledRef.current;
+    video.muted = !useSound;
+    video.volume = useSound ? 1 : 0;
     video.playsInline = true;
     video.loop = false;
+    setIsMuted(!useSound);
 
     try {
       await video.play();
       setNeedsInteraction(false);
       setIsPlaying(true);
     } catch {
-      setNeedsInteraction(true);
+      if (useSound) {
+        video.muted = true;
+        video.volume = 0;
+        setIsMuted(true);
+        try {
+          await video.play();
+          setNeedsInteraction(false);
+          setIsPlaying(true);
+        } catch {
+          setNeedsInteraction(true);
+        }
+      } else {
+        setNeedsInteraction(true);
+      }
     }
   }, []);
 
@@ -154,21 +209,6 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
 
     return () => brand.removeEventListener("canplay", requestPlay);
   }, [phase, brandSrc, tryPlayBrand]);
-
-  useEffect(() => {
-    if (phase !== "brand" || !isPlaying) return;
-
-    const tick = window.setInterval(() => {
-      const video = brandRef.current;
-      const elapsed = video?.currentTime ?? 0;
-
-      if (elapsed >= HERO_SKIP.autoSkipAfter) {
-        skipToCinematic();
-      }
-    }, 250);
-
-    return () => window.clearInterval(tick);
-  }, [phase, isPlaying, skipToCinematic]);
 
   useEffect(() => {
     const cinematic = cinematicRef.current;
@@ -237,9 +277,10 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
 
   const handleUserPlay = useCallback(() => {
     if (hasEnded) return;
-    if (phaseRef.current === "brand") void tryPlayBrand();
-    else void playCinematic();
-  }, [hasEnded, tryPlayBrand, playCinematic]);
+    enableSound();
+    if (phaseRef.current === "brand") void tryPlayBrand(true);
+    else void playCinematic(true);
+  }, [hasEnded, tryPlayBrand, playCinematic, enableSound]);
 
   return {
     phase,
@@ -248,6 +289,7 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
     isPlaying,
     needsInteraction,
     showSkip,
+    isMuted,
     brandSrc,
     cinematicSrc,
     brandRef,
@@ -259,6 +301,7 @@ export function useHeroVideoSequence(): UseHeroVideoSequenceReturn {
     handleBrandError,
     handleCinematicError,
     handleUserPlay,
+    enableSound,
     skipToCinematic,
   };
 }

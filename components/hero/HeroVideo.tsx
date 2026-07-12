@@ -22,6 +22,7 @@ interface HeroVideoProps {
   needsInteraction: boolean;
   showSkip: boolean;
   showEnterGate: boolean;
+  isMuted: boolean;
   onBrandPlaying: () => void;
   onCinematicPlaying: () => void;
   onBrandEnded: () => void;
@@ -30,6 +31,7 @@ interface HeroVideoProps {
   onCinematicError: () => void;
   onUserPlay: () => void;
   onSkip: () => void;
+  onEnableSound: () => void;
 }
 
 const transitionClass = "transition-opacity duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]";
@@ -47,6 +49,7 @@ export function HeroVideo({
   needsInteraction,
   showSkip,
   showEnterGate,
+  isMuted,
   onBrandPlaying,
   onCinematicPlaying,
   onBrandEnded,
@@ -55,9 +58,13 @@ export function HeroVideo({
   onCinematicError,
   onUserPlay,
   onSkip,
+  onEnableSound,
 }: HeroVideoProps) {
   const showPlayButton =
     (needsInteraction || hasError) && !hasEnded && !isPlaying && phase !== "transition";
+
+  const showSoundButton =
+    isMuted && !hasEnded && !showEnterGate && phase !== "transition" && (isPlaying || needsInteraction);
 
   const brandOpacity =
     showEnterGate || phase === "cinematic"
@@ -96,38 +103,46 @@ export function HeroVideo({
     <>
       <div className="absolute inset-0 bg-ice-black" aria-hidden="true" />
 
-      <video
-        ref={brandRef}
-        src={brandSrc}
-        className={`absolute inset-0 z-[1] h-full w-full object-contain object-center ${transitionClass} ${brandOpacity}`}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        poster={HERO_POSTER.brand.jpg}
-        aria-hidden="true"
-        onPlaying={onBrandPlaying}
-        onEnded={onBrandEnded}
-        onError={onBrandError}
-      />
+      <div
+        className={`absolute inset-0 z-[1] flex items-center justify-center ${transitionClass} ${brandOpacity}`}
+      >
+        <video
+          ref={brandRef}
+          src={brandSrc}
+          className="max-h-full max-w-full object-contain"
+          autoPlay
+          muted={isMuted}
+          playsInline
+          preload="auto"
+          poster={HERO_POSTER.brand.jpg}
+          aria-hidden="true"
+          onPlaying={onBrandPlaying}
+          onEnded={onBrandEnded}
+          onError={onBrandError}
+        />
+      </div>
 
-      <video
-        ref={cinematicRef}
-        src={cinematicSrc}
-        className={`absolute inset-0 z-[2] h-full w-full object-cover ${transitionClass} ${cinematicOpacity} ${
-          hasEnded && !showEnterGate
-            ? "brightness-[1.06] contrast-[1.08] saturate-[1.15]"
-            : ""
-        }`}
-        muted
-        playsInline
-        preload="auto"
-        poster={HERO_POSTER.cinematic.jpg}
-        aria-hidden="true"
-        onPlaying={onCinematicPlaying}
-        onEnded={onCinematicEnded}
-        onError={onCinematicError}
-      />
+      <div
+        className={`absolute inset-0 z-[2] flex items-center justify-center ${transitionClass} ${cinematicOpacity}`}
+      >
+        <video
+          ref={cinematicRef}
+          src={cinematicSrc}
+          className={`max-h-full max-w-full object-contain ${
+            hasEnded && !showEnterGate
+              ? "brightness-[1.06] contrast-[1.08] saturate-[1.15]"
+              : ""
+          }`}
+          muted={isMuted}
+          playsInline
+          preload="auto"
+          poster={HERO_POSTER.cinematic.jpg}
+          aria-hidden="true"
+          onPlaying={onCinematicPlaying}
+          onEnded={onCinematicEnded}
+          onError={onCinematicError}
+        />
+      </div>
 
       <AnimatePresence>
         {phase === "transition" && (
@@ -162,7 +177,27 @@ export function HeroVideo({
         )}
       </AnimatePresence>
 
-      {showPlayButton && <PlayOverlay label="Reproducir intro" onPlay={onUserPlay} />}
+      <AnimatePresence>
+        {showSoundButton && (
+          <motion.button
+            key="sound-btn"
+            type="button"
+            onClick={onEnableSound}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.4, ease: LUXURY_EASE }}
+            className="absolute bottom-8 left-6 flex items-center gap-2 border border-ice-white/40 bg-black/45 px-4 py-2.5 font-condensed text-[11px] font-bold uppercase tracking-wide text-ice-white backdrop-blur-sm transition-colors hover:bg-black/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ice-white md:bottom-10 md:left-10"
+            style={{ zIndex: HERO_Z_INDEX.skip }}
+            aria-label="Activar sonido del vídeo"
+          >
+            <span aria-hidden="true">🔊</span>
+            Sonido
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {showPlayButton && <PlayOverlay label="Reproducir con sonido" onPlay={onUserPlay} />}
     </>
   );
 }

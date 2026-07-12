@@ -28,6 +28,7 @@ export function Hero() {
     isPlaying,
     needsInteraction,
     showSkip,
+    isMuted,
     brandSrc,
     cinematicSrc,
     brandRef,
@@ -39,6 +40,7 @@ export function Hero() {
     handleBrandError,
     handleCinematicError,
     handleUserPlay,
+    enableSound,
     skipToCinematic,
   } = useHeroVideoSequence();
 
@@ -89,10 +91,10 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="inicio"
-      className={`relative w-full ${hasEntered ? "h-[200vh]" : "h-screen"}`}
+      className={`relative w-full ${hasEntered ? "h-[200vh]" : "h-[100dvh] min-h-[100svh]"}`}
       aria-label="Introducción ICE UP"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] min-h-[100svh] w-full overflow-hidden">
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ zIndex: HERO_Z_INDEX.video }}
@@ -110,6 +112,7 @@ export function Hero() {
             needsInteraction={needsInteraction}
             showSkip={showSkip}
             showEnterGate={showEnterGate}
+            isMuted={isMuted}
             onBrandPlaying={handleBrandPlaying}
             onCinematicPlaying={handleCinematicPlaying}
             onBrandEnded={handleBrandEnded}
@@ -118,6 +121,7 @@ export function Hero() {
             onCinematicError={handleCinematicError}
             onUserPlay={handleUserPlay}
             onSkip={skipToCinematic}
+            onEnableSound={enableSound}
           />
         </div>
 

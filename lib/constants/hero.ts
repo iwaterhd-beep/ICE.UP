@@ -9,10 +9,9 @@ export const HERO_CINEMATIC_VIDEOS = {
   fallback: "/videos/intro-cinematic-mobile.mp4",
 } as const;
 
-/** Segundos antes de mostrar skip; auto-skip al cinematic si no pulsan */
+/** Segundos antes de mostrar el botón Saltar (solo manual, sin auto-skip) */
 export const HERO_SKIP = {
   availableAfter: 4,
-  autoSkipAfter: 12,
   transitionMs: 900,
 } as const;
 
