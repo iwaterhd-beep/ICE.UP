@@ -34,13 +34,19 @@
       </div>
 
       <ul class="site-footer__links">
-        <li><a href="{{ routes.root_url }}">Inicio</a></li>
-        <li><a href="/collections/handmade">Colección</a></li>
-        <li><a href="{{ pages.drop.url | default: '/pages/drop' }}">Drop</a></li>
-        <li><a href="{{ pages.historia.url | default: '/pages/historia' }}">Historia</a></li>
-        <li><a href="{{ pages['el-chico-de-hielo'].url | default: '/pages/el-chico-de-hielo' }}">El Chico de Hielo</a></li>
-        <li><a href="{{ pages.faq.url | default: '/pages/faq' }}">FAQ</a></li>
-        <li><a href="{{ pages.contacto.url | default: '/pages/contacto' }}">Contacto</a></li>
+        {%- if section.settings.menu != blank -%}
+          {%- for link in section.settings.menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a href="{{ routes.root_url }}">Inicio</a></li>
+          <li><a href="/collections/handmade">Colección</a></li>
+          <li><a href="{{ pages.drop.url | default: '/pages/drop' }}">Drop</a></li>
+          <li><a href="{{ pages.historia.url | default: '/pages/historia' }}">Historia</a></li>
+          <li><a href="{{ pages['el-chico-de-hielo'].url | default: '/pages/el-chico-de-hielo' }}">El Chico de Hielo</a></li>
+          <li><a href="{{ pages.faq.url | default: '/pages/faq' }}">FAQ</a></li>
+          <li><a href="{{ pages.contacto.url | default: '/pages/contacto' }}">Contacto</a></li>
+        {%- endif -%}
         {%- if section.settings.instagram != blank -%}
           <li>
             <a href="{{ section.settings.instagram }}" target="_blank" rel="noopener">Instagram</a>
@@ -66,21 +72,17 @@
     </ul>
 
     <ul class="site-footer__legal palace-label">
-      <li>
-        <a href="{{ pages.envios.url | default: '/pages/envios' }}">Envíos</a>
-      </li>
-      <li>
-        <a href="{{ pages.devoluciones.url | default: '/pages/devoluciones' }}">Devoluciones</a>
-      </li>
-      <li>
-        <a href="{{ pages.privacidad.url | default: '/pages/privacidad' }}">Privacidad</a>
-      </li>
-      <li>
-        <a href="{{ pages.cookies.url | default: '/pages/cookies' }}">Cookies</a>
-      </li>
-      <li>
-        <a href="{{ pages.terminos.url | default: '/pages/terminos' }}">Términos</a>
-      </li>
+      {%- if section.settings.legal_menu != blank -%}
+        {%- for link in section.settings.legal_menu.links -%}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endfor -%}
+      {%- else -%}
+        <li><a href="{{ pages.envios.url | default: '/pages/envios' }}">Envíos</a></li>
+        <li><a href="{{ pages.devoluciones.url | default: '/pages/devoluciones' }}">Devoluciones</a></li>
+        <li><a href="{{ pages.privacidad.url | default: '/pages/privacidad' }}">Privacidad</a></li>
+        <li><a href="{{ pages.cookies.url | default: '/pages/cookies' }}">Cookies</a></li>
+        <li><a href="{{ pages.terminos.url | default: '/pages/terminos' }}">Términos</a></li>
+      {%- endif -%}
     </ul>
 
     <div class="site-footer__bottom">
@@ -110,6 +112,16 @@
       "type": "url",
       "id": "instagram",
       "label": "Instagram"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menú del footer (Navegación de Shopify)"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Menú legal (Navegación). Usa /pages/envios, no Políticas de Shopify."
     }
   ],
   "presets": [{ "name": "Footer" }]
