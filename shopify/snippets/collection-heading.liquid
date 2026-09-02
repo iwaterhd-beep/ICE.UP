@@ -1,0 +1,13 @@
+{%- comment -%}
+  En sections/main-collection.liquid (o el section de la colección),
+  sustituir {{ collection.title }} del H1 por:
+    {% render 'collection-heading' %}
+
+  El handle handmade se llama "Drop" en el admin y Google lo confunde
+  con /pages/drop. En SERP queremos "Colección".
+{%- endcomment -%}
+{%- if collection.handle == 'handmade' -%}
+  Colección
+{%- else -%}
+  {{ collection.title }}
+{%- endif -%}

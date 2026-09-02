@@ -2,6 +2,6 @@ export const SITE = {
   name: "ICE UP!",
   tagline: "El Chico de Hielo",
   description:
-    "Marca de ropa de lujo artesanal. Piezas cosidas y confeccionadas a mano.",
+    "ICE UP! Streetwear born in Hospitalet. Drops limitados, El Chico de Hielo. Del barrio al mundo.",
   locale: "es",
 } as const;
