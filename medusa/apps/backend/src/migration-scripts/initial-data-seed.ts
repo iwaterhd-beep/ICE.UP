@@ -10,7 +10,6 @@ import {
   createCollectionsWorkflow,
   createInventoryLevelsWorkflow,
   createProductCategoriesWorkflow,
-  createProductOptionsWorkflow,
   createProductsWorkflow,
   createRegionsWorkflow,
   createSalesChannelsWorkflow,
@@ -322,24 +321,8 @@ export default async function initial_data_seed({
     },
   });
 
-  const { result: productOptionsResult } = await createProductOptionsWorkflow(
-    container
-  ).run({
-    input: {
-      product_options: [
-        {
-          title: "Size",
-          values: ["S", "M", "L", "XL"],
-        },
-        {
-          title: "Color",
-          values: ["Black", "White"],
-        },
-      ],
-    },
-  });
-  const sizeOption = productOptionsResult.find((o) => o.title === "Size")!;
-  const colorOption = productOptionsResult.find((o) => o.title === "Color")!;
+  const sizeValues = ["S", "M", "L", "XL"];
+  const colorValues = ["Black", "White"];
 
   await createProductsWorkflow(container).run({
     input: {
@@ -355,6 +338,9 @@ export default async function initial_data_seed({
           weight: 400,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
+          metadata: {
+            size_guide: "tee",
+          },
           images: [
             {
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png",
@@ -370,8 +356,8 @@ export default async function initial_data_seed({
             },
           ],
           options: [
-            { id: sizeOption.id },
-            { id: colorOption.id },
+            { title: "Size", values: sizeValues },
+            { title: "Color", values: colorValues },
           ],
           variants: [
             {
@@ -536,6 +522,9 @@ export default async function initial_data_seed({
           weight: 400,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
+          metadata: {
+            size_guide: "tee",
+          },
           images: [
             {
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-front.png",
@@ -544,7 +533,7 @@ export default async function initial_data_seed({
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-back.png",
             },
           ],
-          options: [{ id: sizeOption.id }],
+          options: [{ title: "Size", values: sizeValues }],
           variants: [
             {
               title: "S",
@@ -632,6 +621,9 @@ export default async function initial_data_seed({
           weight: 400,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
+          metadata: {
+            size_guide: "tee",
+          },
           images: [
             {
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-front.png",
@@ -640,7 +632,7 @@ export default async function initial_data_seed({
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-back.png",
             },
           ],
-          options: [{ id: sizeOption.id }],
+          options: [{ title: "Size", values: sizeValues }],
           variants: [
             {
               title: "S",
@@ -728,6 +720,9 @@ export default async function initial_data_seed({
           weight: 400,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
+          metadata: {
+            size_guide: "tee",
+          },
           images: [
             {
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png",
@@ -736,7 +731,7 @@ export default async function initial_data_seed({
               url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-back.png",
             },
           ],
-          options: [{ id: sizeOption.id }],
+          options: [{ title: "Size", values: sizeValues }],
           variants: [
             {
               title: "S",

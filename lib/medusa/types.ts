@@ -1,3 +1,5 @@
+import { resolveSizeGuideId } from "@/lib/constants/size-guides";
+
 export interface StorefrontVariant {
   id: string;
   title: string;
@@ -17,6 +19,8 @@ export interface StorefrontProduct {
   variants: StorefrontVariant[];
   collection?: string;
   soldOut?: boolean;
+  /** Id de guía de tallas de ESTE producto. Sin fallback de tienda. */
+  sizeGuideId?: string;
 }
 
 interface MedusaCalculatedPrice {
@@ -45,6 +49,7 @@ export interface MedusaProductLike {
   images?: { url?: string }[];
   variants?: MedusaVariant[];
   collection?: { title?: string | null };
+  metadata?: Record<string, unknown> | null;
 }
 
 export function formatPrice(amount: number, currency = "EUR"): string {
@@ -91,5 +96,9 @@ export function mapMedusaProduct(product: MedusaProductLike): StorefrontProduct 
     images: images.length > 0 ? (images as string[]) : ["/archive/entry-5.jpg"],
     variants,
     collection: product.collection?.title ?? undefined,
+    sizeGuideId: resolveSizeGuideId({
+      handle: product.handle,
+      metadata: product.metadata,
+    }),
   };
 }

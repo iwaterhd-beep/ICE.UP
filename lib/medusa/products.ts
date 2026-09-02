@@ -7,7 +7,7 @@ import {
 import { mapMedusaProduct, type StorefrontProduct } from "./types";
 
 const PRODUCT_FIELDS =
-  "id,handle,title,description,thumbnail,*images,*variants,*variants.options,*variants.calculated_price,*collection";
+  "id,handle,title,description,thumbnail,*images,*variants,*variants.options,*variants.calculated_price,*collection,metadata";
 
 export async function getProducts(): Promise<StorefrontProduct[]> {
   try {

@@ -1,4 +1,5 @@
 import type { StorefrontProduct, StorefrontVariant } from "@/lib/medusa/types";
+import { resolveSizeGuideId } from "@/lib/constants/size-guides";
 
 function variant(
   id: string,
@@ -30,6 +31,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
       "/products/gorra-desert-camo-side.png",
     ],
     collection: "Drop Activo",
+    sizeGuideId: "cap",
     variants: [
       variant("fb-cap-one", "Única", 4200, [{ label: "Talla", value: "Única" }]),
     ],
@@ -47,6 +49,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
       "/products/core-tees-pack.png",
     ],
     collection: "Drop Activo",
+    sizeGuideId: "tee",
     variants: teeVariants("fb-stb", 3900),
   },
   {
@@ -63,6 +66,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
       "/products/hoods-chateau-box.png",
     ],
     collection: "Invierno",
+    sizeGuideId: "oversized_tee",
     variants: teeVariants("fb-hc", 4800),
   },
   {
@@ -77,6 +81,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
       "/products/core-tees-pack.png",
     ],
     collection: "Gélido Origins",
+    sizeGuideId: "tee",
     variants: teeVariants("fb-ln", 3800),
   },
   {
@@ -92,6 +97,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
       "/products/core-tees-pack.png",
     ],
     collection: "Permafrost",
+    sizeGuideId: "tee",
     variants: teeVariants("fb-lc", 3800),
   },
   {
@@ -103,6 +109,7 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
     thumbnail: "/products/logo-tee-navy-lifestyle.png",
     images: ["/products/logo-tee-navy-lifestyle.png"],
     collection: "Gélido Origins",
+    sizeGuideId: "tee",
     variants: teeVariants("fb-lnv", 3800),
   },
   {
@@ -125,12 +132,23 @@ export const FALLBACK_PRODUCTS: StorefrontProduct[] = [
   },
 ];
 
+function withResolvedGuide(product: StorefrontProduct): StorefrontProduct {
+  return {
+    ...product,
+    sizeGuideId: resolveSizeGuideId({
+      handle: product.handle,
+      sizeGuideId: product.sizeGuideId,
+    }),
+  };
+}
+
 export function getFallbackProducts(): StorefrontProduct[] {
-  return FALLBACK_PRODUCTS;
+  return FALLBACK_PRODUCTS.map(withResolvedGuide);
 }
 
 export function getFallbackProduct(handle: string): StorefrontProduct | null {
-  return FALLBACK_PRODUCTS.find((product) => product.handle === handle) ?? null;
+  const product = FALLBACK_PRODUCTS.find((item) => item.handle === handle);
+  return product ? withResolvedGuide(product) : null;
 }
 
 export function getFallbackCollections(): { id: string; title: string; handle: string }[] {

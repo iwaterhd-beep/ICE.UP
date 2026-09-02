@@ -6,3 +6,10 @@ export {
   HERO_CONTENT,
   HERO_Z_INDEX,
 } from "./hero";
+export {
+  SIZE_GUIDES,
+  SIZE_GUIDE_BY_HANDLE,
+  resolveSizeGuideId,
+  getSizeGuide,
+} from "./size-guides";
+export type { SizeGuide, SizeGuideRow } from "./size-guides";
