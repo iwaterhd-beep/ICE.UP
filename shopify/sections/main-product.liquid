@@ -1,0 +1,148 @@
+{%- comment -%}
+  Reemplaza sections/main-product.liquid del tema Iceup.
+  La guía de tallas sale del metafield del producto, no de un ajuste del tema.
+{%- endcomment -%}
+
+<section class="product-page">
+  <div class="container">
+    <div class="product-layout">
+      <div class="product-gallery">
+        <div class="product-gallery__main">
+          {%- if product.featured_image -%}
+            <img
+              data-gallery-main
+              src="{{ product.featured_image | image_url: width: 1400 }}"
+              alt="{{ product.featured_image.alt | default: product.title | escape }}"
+              width="1400"
+              height="{{ 1400 | divided_by: product.featured_image.aspect_ratio | round }}"
+            >
+          {%- endif -%}
+        </div>
+        {%- if product.images.size > 1 -%}
+          <div class="product-gallery__thumbs">
+            {%- for image in product.images -%}
+              <button
+                type="button"
+                data-gallery-thumb
+                data-src="{{ image | image_url: width: 1400 }}"
+                aria-label="Imagen {{ forloop.index }}"
+              >
+                <img
+                  src="{{ image | image_url: width: 200 }}"
+                  alt=""
+                  loading="lazy"
+                  width="200"
+                  height="200"
+                >
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="product-info">
+        {%- if product.collections.first -%}
+          <p class="palace-label" style="color: var(--ice-gray-500); margin: 0;">
+            {{ product.collections.first.title }}
+          </p>
+        {%- endif -%}
+        <h1 class="palace-headline product-info__title">{{ product.title }}</h1>
+        <p class="product-info__price">
+          {{ product.selected_or_first_available_variant.price | money }}
+        </p>
+
+        {%- if product.description != blank -%}
+          <div class="product-info__desc">{{ product.description }}</div>
+        {%- endif -%}
+
+        <details class="size-guide product-accordion">
+          <summary class="size-guide__summary palace-label">Detalles y cuidado</summary>
+          <div class="size-guide__body product-accordion__body">
+            {%- if section.settings.care != blank -%}
+              {{ section.settings.care }}
+            {%- else -%}
+              <ul class="product-care-list">
+                <li>Composición: algodón pesado (tees) / materiales según ficha</li>
+                <li>Lavado a máquina en frío, del revés</li>
+                <li>No usar lejía; plancha suave si hace falta</li>
+                <li>Edición limitada — sin reposición masiva</li>
+              </ul>
+            {%- endif -%}
+          </div>
+        </details>
+
+        {% form 'product', product, class: 'shopify-product-form', data-product-form: true %}
+          <div class="product-form">
+            {%- if product.variants.size > 1 -%}
+              <div>
+                <label class="palace-label" for="Variant-{{ section.id }}">Talla</label>
+                <select name="id" id="Variant-{{ section.id }}">
+                  {%- for variant in product.variants -%}
+                    <option
+                      value="{{ variant.id }}"
+                      {% if variant == product.selected_or_first_available_variant %}selected{% endif %}
+                      {% unless variant.available %}disabled{% endunless %}
+                    >
+                      {{ variant.title }}
+                      {%- unless variant.available %} — Agotado{% endunless %}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+            {%- else -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            {%- endif -%}
+
+            {% render 'size-guide-product', product: product %}
+
+            <details class="size-guide product-accordion">
+              <summary class="size-guide__summary palace-label">Devoluciones</summary>
+              <div class="size-guide__body product-accordion__body">
+                <p>Puedes devolver tu pedido en un plazo de <strong>14 días naturales</strong> desde la recepción. Prenda sin usar, con etiquetas y packaging original.</p>
+                <p>Gastos de devolución a cargo del cliente salvo error nuestro o defecto.</p>
+                <p>
+                  <a href="{{ pages.devoluciones.url | default: '/pages/devoluciones' }}">Política de devoluciones</a>
+                  ·
+                  <a href="{{ pages.faq.url | default: '/pages/faq' }}">Preguntas frecuentes</a>
+                </p>
+              </div>
+            </details>
+
+            <button
+              type="submit"
+              class="btn btn--solid"
+              {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+            >
+              {%- if product.selected_or_first_available_variant.available -%}
+                Añadir al carrito
+              {%- else -%}
+                Agotado
+              {%- endif -%}
+            </button>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Producto",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Guía de tallas"
+    },
+    {
+      "type": "paragraph",
+      "content": "No uses una imagen global aquí. Sube la guía en cada producto: metafield custom.guia_de_tallas (Archivo / Imagen)."
+    },
+    {
+      "type": "html",
+      "id": "care",
+      "label": "Detalles y cuidado"
+    }
+  ]
+}
+{% endschema %}

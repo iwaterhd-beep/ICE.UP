@@ -1,0 +1,61 @@
+{%- comment -%}
+  Guía de tallas POR PRODUCTO (no global).
+
+  Cómo usarlo desde Shopify Admin (sin tocar código otra vez):
+  1. Ajustes → Datos personalizados → Productos → Añadir definición
+     Nombre: Guía de tallas
+     Espacio de nombres y clave: custom.guia_de_tallas
+     Tipo: Archivo → Imágenes
+  2. En cada producto: sube SU imagen de guía.
+     Si un producto no tiene imagen, no se muestra guía (no hereda la de otro).
+
+  En sections/main-product.liquid, sustituye el bloque de guía global por:
+    {% render 'size-guide-product', product: product %}
+{%- endcomment -%}
+
+{%- liquid
+  assign guide_mf = product.metafields.custom.guia_de_tallas
+  if guide_mf.value == blank
+    assign guide_mf = product.metafields.custom.size_guide
+  endif
+  if guide_mf.value == blank
+    assign guide_mf = product.metafields.custom.size_chart
+  endif
+  if guide_mf.value == blank
+    assign guide_mf = product.metafields.iceup.guia_de_tallas
+  endif
+
+  assign guide_image = nil
+  assign guide_html = nil
+  assign guide_page = nil
+
+  if guide_mf.value != blank
+    assign mf_type = guide_mf.type
+    if mf_type == 'file_reference' or mf_type == 'image_reference'
+      assign guide_image = guide_mf.value
+    elsif mf_type == 'page_reference'
+      assign guide_page = guide_mf.value
+    else
+      assign guide_html = guide_mf | metafield_tag
+    endif
+  endif
+-%}
+
+{%- if guide_image != blank or guide_html != blank or guide_page != blank -%}
+  <details class="size-guide">
+    <summary class="size-guide__summary palace-label">Guía de tallas</summary>
+    <div class="size-guide__body">
+      {%- if guide_image != blank -%}
+        {{
+          guide_image
+          | image_url: width: 1400
+          | image_tag: class: 'size-guide__img', loading: 'lazy', widths: '352, 832, 1200, 1400', alt: product.title
+        }}
+      {%- elsif guide_page != blank -%}
+        <div class="rte">{{ guide_page.content }}</div>
+      {%- else -%}
+        {{ guide_html }}
+      {%- endif -%}
+    </div>
+  </details>
+{%- endif -%}

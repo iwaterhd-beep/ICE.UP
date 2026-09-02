@@ -1,0 +1,24 @@
+CÓMO CAMBIAR LA GUÍA DE TALLAS DESDE SHOPIFY (por producto)
+
+El tema tenía UNA imagen global (chateau_hood_guia_de_tallas.png) en todas
+las fichas. Por eso, al cambiarla, se aplicaba a todo.
+
+1) Una vez: Ajustes → Datos personalizados → Productos → Añadir definición
+   - Nombre: Guía de tallas
+   - Espacio de nombres y clave: custom.guia_de_tallas
+   - Tipo: Archivo → Imágenes
+   - Guardar
+
+2) En CADA producto (Productos → abrir la ficha → abajo, Metafields):
+   - Sube la imagen de guía de ESE producto
+   - Gorra ≠ camiseta: cada uno su archivo
+   - Si lo dejas vacío, ese producto no muestra guía
+
+3) Tema Iceup → Editar código:
+   - Crear snippet size-guide-product.liquid (copiar el del repo)
+   - Sustituir sections/main-product.liquid (copiar el del repo)
+   - En layout/theme.liquid: {% render 'seo-head' %}  (sitelinks)
+   - Sustituir footer.liquid (menú legal desde Navegación)
+
+NO cambies la guía en “Personalizar tema” / ajustes globales.
+Eso es lo que la ponía igual en todos.
