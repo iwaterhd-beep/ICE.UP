@@ -1,0 +1,117 @@
+{%- comment -%}
+  ICE UP! sitelinks SEO
+  Pegar en layout/theme.liquid, dentro de <head>, DESPUÉS del <title>:
+    {% render 'seo-head' %}
+
+  Google está mostrando /policies/* como sitelinks porque esas URLs
+  tienen mucho texto único y el footer las enlaza. Este snippet:
+  1. noindexa las policies nativas de Shopify (duplican /pages/envios etc.)
+  2. declara la navegación comercial (Colección, Drop, Historia…)
+  3. da a la colección un CollectionPage + ItemList propios
+{%- endcomment -%}
+
+{%- assign iceup_base = shop.secure_url | default: shop.url | strip -%}
+
+{%- if request.page_type == 'policy' -%}
+  <meta name="robots" content="noindex, follow">
+{%- endif -%}
+
+{%- if request.page_type == 'collection' and collection.handle == 'handmade' -%}
+  <meta name="description" content="Colección ICE UP!: tees oversize, gorras y piezas limitadas. Streetwear desde L'Hospitalet. Envío gratis desde 55 €.">
+{%- endif -%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ shop.name | json }},
+  "alternateName": ["ICE UP!", "IceUp!", "El Chico de Hielo"],
+  "url": {{ iceup_base | json }},
+  "inLanguage": "es-ES",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {{ iceup_base | append: '/search?q={search_term_string}' | json }},
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "ICE UP! — páginas principales",
+  "itemListElement": [
+    {
+      "@type": "SiteNavigationElement",
+      "position": 1,
+      "name": "Colección",
+      "description": "Tees, gorras y drops limitados ICE UP!",
+      "url": {{ iceup_base | append: '/collections/handmade' | json }}
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 2,
+      "name": "Drop",
+      "description": "Archivo de drops ICE UP!",
+      "url": {{ iceup_base | append: '/pages/drop' | json }}
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 3,
+      "name": "Historia",
+      "description": "La historia de ICE UP! y El Chico de Hielo",
+      "url": {{ iceup_base | append: '/pages/historia' | json }}
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 4,
+      "name": "El Chico de Hielo",
+      "url": {{ iceup_base | append: '/pages/el-chico-de-hielo' | json }}
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 5,
+      "name": "Preguntas frecuentes",
+      "url": {{ iceup_base | append: '/pages/faq' | json }}
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 6,
+      "name": "Contacto",
+      "url": {{ iceup_base | append: '/pages/contacto' | json }}
+    }
+  ]
+}
+</script>
+
+{%- if request.page_type == 'collection' and collection -%}
+  {%- assign iceup_col_name = collection.title -%}
+  {%- if collection.handle == 'handmade' -%}
+    {%- assign iceup_col_name = 'Colección' -%}
+  {%- endif -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ iceup_col_name | append: ' — ICE UP!' | json }},
+  "url": {{ request.origin | append: collection.url | json }},
+  "description": {{ collection.description | strip_html | default: 'Catálogo streetwear ICE UP!. Tees oversize, gorras y ediciones limitadas desde L’Hospitalet.' | json }},
+  "isPartOf": { "@type": "WebSite", "name": {{ shop.name | json }}, "url": {{ iceup_base | json }} },
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ collection.products_count | json }},
+    "itemListElement": [
+      {%- for product in collection.products limit: 24 -%}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.index }},
+        "url": {{ request.origin | append: product.url | json }},
+        "name": {{ product.title | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  }
+}
+</script>
+{%- endif -%}

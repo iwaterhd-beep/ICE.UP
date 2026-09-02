@@ -1,0 +1,117 @@
+{%- comment -%}
+  Reemplazar sections/footer.liquid del tema Iceup.
+  Los enlaces legales van a /pages/envios, /pages/devoluciones, /pages/privacidad
+  y /pages/terminos (ya existen) en vez de /policies/* de Shopify.
+  Así Google deja de usar Términos / Envío / Reembolso / Privacidad como sitelinks.
+{%- endcomment -%}
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div>
+        {%- if settings.brand_wordmark != blank -%}
+          <img
+            class="site-footer__brand-img"
+            src="{{ settings.brand_wordmark | image_url: width: 280 }}"
+            alt="{{ shop.name | escape }}"
+            width="140"
+            height="36"
+            loading="lazy"
+          >
+        {%- else -%}
+          <img
+            class="site-footer__brand-img"
+            src="{{ 'brand-wordmark.png' | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            width="140"
+            height="36"
+            loading="lazy"
+          >
+        {%- endif -%}
+        <p class="site-footer__tagline palace-label">
+          {{ section.settings.tagline | default: "El Chico de Hielo — Streetwear born in L'Hospitalet. Drops limitados." }}
+        </p>
+      </div>
+
+      <ul class="site-footer__links">
+        <li><a href="{{ routes.root_url }}">Inicio</a></li>
+        <li><a href="/collections/handmade">Colección</a></li>
+        <li><a href="{{ pages.drop.url | default: '/pages/drop' }}">Drop</a></li>
+        <li><a href="{{ pages.historia.url | default: '/pages/historia' }}">Historia</a></li>
+        <li><a href="{{ pages['el-chico-de-hielo'].url | default: '/pages/el-chico-de-hielo' }}">El Chico de Hielo</a></li>
+        <li><a href="{{ pages.faq.url | default: '/pages/faq' }}">FAQ</a></li>
+        <li><a href="{{ pages.contacto.url | default: '/pages/contacto' }}">Contacto</a></li>
+        {%- if section.settings.instagram != blank -%}
+          <li>
+            <a href="{{ section.settings.instagram }}" target="_blank" rel="noopener">Instagram</a>
+          </li>
+        {%- endif -%}
+      </ul>
+    </div>
+
+    <ul class="site-footer__contact palace-label">
+      {%- if shop.email != blank -%}
+        <li><a href="mailto:{{ shop.email }}">{{ shop.email }}</a></li>
+      {%- endif -%}
+      {%- if section.settings.phone != blank -%}
+        <li>
+          <a href="tel:{{ section.settings.phone | replace: ' ', '' }}">{{ section.settings.phone }}</a>
+        </li>
+      {%- endif -%}
+      {%- if section.settings.instagram != blank -%}
+        <li>
+          <a href="{{ section.settings.instagram }}" target="_blank" rel="noopener">@iceupbrand</a>
+        </li>
+      {%- endif -%}
+    </ul>
+
+    <ul class="site-footer__legal palace-label">
+      <li>
+        <a href="{{ pages.envios.url | default: '/pages/envios' }}">Envíos</a>
+      </li>
+      <li>
+        <a href="{{ pages.devoluciones.url | default: '/pages/devoluciones' }}">Devoluciones</a>
+      </li>
+      <li>
+        <a href="{{ pages.privacidad.url | default: '/pages/privacidad' }}">Privacidad</a>
+      </li>
+      <li>
+        <a href="{{ pages.cookies.url | default: '/pages/cookies' }}">Cookies</a>
+      </li>
+      <li>
+        <a href="{{ pages.terminos.url | default: '/pages/terminos' }}">Términos</a>
+      </li>
+    </ul>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copy palace-label">© {{ 'now' | date: '%Y' }} {{ shop.name }}</p>
+      <p class="site-footer__credit">Desarrollada por <span>[ SvqDev ]</span></p>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "El Chico de Hielo — Streetwear born in L'Hospitalet. Drops limitados."
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Teléfono",
+      "default": "+34 630666273"
+    },
+    {
+      "type": "url",
+      "id": "instagram",
+      "label": "Instagram"
+    }
+  ],
+  "presets": [{ "name": "Footer" }]
+}
+{% endschema %}

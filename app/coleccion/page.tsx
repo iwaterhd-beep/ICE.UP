@@ -3,8 +3,11 @@ import { getProducts } from "@/lib/medusa";
 import { CollectionView } from "@/components/shop/CollectionView";
 
 export const metadata: Metadata = {
-  title: "Colección — ICE UP!",
-  description: "Piezas disponibles de ICE UP!. Ediciones limitadas artesanales.",
+  title: {
+    absolute: "Colección streetwear — ICE UP!",
+  },
+  description:
+    "Colección ICE UP!: tees oversize, gorras y piezas limitadas. Streetwear desde L'Hospitalet.",
 };
 
 export default async function ColeccionPage() {

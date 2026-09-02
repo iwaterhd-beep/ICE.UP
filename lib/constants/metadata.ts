@@ -7,7 +7,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
+    default: `${SITE.name} — Streetwear · ${SITE.tagline}`,
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
@@ -15,7 +15,7 @@ export const defaultMetadata: Metadata = {
     type: "website",
     locale: "es_ES",
     siteName: SITE.name,
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `${SITE.name} — Streetwear · ${SITE.tagline}`,
     description: SITE.description,
     images: [{ url: BRAND.isotipo, width: 512, height: 512, alt: SITE.name }],
   },
