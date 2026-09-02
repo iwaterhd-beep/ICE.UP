@@ -8,6 +8,7 @@ import type { StorefrontProduct, StorefrontVariant } from "@/lib/medusa/types";
 import { formatPrice } from "@/lib/medusa/types";
 import { getPalaceCopy } from "@/lib/constants/palace-copy";
 import { AddToCartButton, BuyNowButton } from "./AddToCartButton";
+import { SizeGuideButton } from "./SizeGuide";
 
 interface ProductDetailProps {
   product: StorefrontProduct;
@@ -136,6 +137,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 </button>
               ))}
             </div>
+            <SizeGuideButton sizeGuideId={product.sizeGuideId} />
+          </div>
+        )}
+
+        {!soldOut && product.variants.length <= 1 && (
+          <div className="mt-8">
+            <SizeGuideButton sizeGuideId={product.sizeGuideId} />
           </div>
         )}
 
